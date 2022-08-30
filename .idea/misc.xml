@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/drawable/button_background.xml" value="0.4595" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/drawable/ic_launcher_background.xml" value="0.296" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout-v28/activity_touch_measure.xml" value="0.5307291666666667" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_angle_study.xml" value="0.5171875" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_main.xml" value="0.4466666666666667" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_measure_option.xml" value="0.5317708333333333" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_move_measure.xml" value="0.264" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_size_study.xml" value="0.5" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_start_option.xml" value="0.5" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_study_option.xml" value="0.5317708333333333" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_test.xml" value="0.5317708333333333" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/activity_touch_measure.xml" value="0.23125" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/angle_study_preparation.xml" value="0.5317708333333333" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/interaction_tip.xml" value="0.5307291666666667" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/sample_touch_area.xml" value="0.5171875" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/size_study_confirm.xml" value="0.5317708333333333" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/size_study_preparation.xml" value="0.5" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/study_confirm.xml" value="0.5018518518518519" />
+        <entry key="..\:/Z-CS/Android/ScaleTeacher/app/src/main/res/layout/test_report.xml" value="0.5317708333333333" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

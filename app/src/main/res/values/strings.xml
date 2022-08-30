@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name">Scale Teacher</string>
+
+    <string name="start_option_page" translatable="true">欢迎使用Scale Teacher，请在以下三种模式中进行选择。</string>
+    <string name="start_option1" translatable="true">探索</string>
+    <string name="start_option1_description" translatable="true">探索模式：进入此模式后，你可以自由测量尺寸或角度</string>
+    <string name="start_option2" translatable="true">学习</string>
+    <string name="start_option2_description" translatable="true">学习模式：进入此模式后，你可以学习特定尺寸或角度对应的肢体感觉</string>
+    <string name="start_option3" translatable="true">测试</string>
+    <string name="start_option3_description" translatable="true">测试模式：进入此模式后，你可以复习已经学习过的尺寸或角度</string>
+
+    <string name="measure_option_page" translatable="true">已进入探索模式，请选择测量场景与方式。</string>
+    <string name="measure_option1" translatable="true">屏幕两点\n测长度</string>
+    <string name="measure_option2" translatable="true">手机移动\n测位移</string>
+    <string name="measure_option3" translatable="true">手机转动\n测角度</string>
+
+    <string name="touch_measure_tip" translatable="true">
+        使用帮助\n在本模式下，你可以在屏幕上放置两个手指，之后将播报两手指间的距离。如果您正在使用读屏服务，可能需要使读屏处于手指触摸区域，再双击并按住屏幕以激活屏幕测量，之后另外放置两根手指。
+    </string>
+    <string name="length_measure_tip" translatable="true">
+        使用帮助\n在本模式下，你可以使用屏幕中央控件标记手机初始位置，然后缓慢移动手机至终点位置，并再次通过屏幕中央控件标记。系统将播报两个标记位置之间的直线距离。你可以多次进行标记测量。
+    </string>
+    <string name="rotation_measure_tip" translatable="true">
+        使用帮助\n在本模式下，你可以通过屏幕中央控件标记手机当前状态；每当两次标记完成后，将播报手机从初始状态到结束状态的转动角度。你可以多次进行标记测量。建议你通过将手机固定在身体部位上，来体会转动不同角度的感觉。
+    </string>
+
+    <string name="mark_pose" translatable="true">标记位姿状态</string>
+    <string name="go_back" translatable="true">返回上一页</string>
+    <string name="touch_area" translatable="true">手指触摸区域</string>
+
+    <string name="study_option_page" translatable="true">已进入学习模式，请选择学习内容。</string>
+    <string name="study_option1" translatable="true">尺寸学习</string>
+    <string name="study_option2" translatable="true">角度学习</string>
+
+    <string name="size_study_preparation_page" translatable="true">请在以下方式中确定要学习的尺寸。</string>
+    <string name="angle_study_preparation_page" translatable="true">请在以下方式中确定要学习的角度。</string>
+    <string name="random_size" translatable="true">随机尺寸</string>
+    <string name="random_angle" translatable="true">随机角度</string>
+    <string name="custom_size" translatable="true">自定义尺寸</string>
+    <string name="custom_angle" translatable="true">自定义角度</string>
+    <string name="custom_size_hint" translatable="true">请输入要学习的整数尺寸数字，单位为厘米</string>
+    <string name="custom_angle_hint" translatable="true">请输入要学习的整数角度数字，单位为度</string>
+    <string name="confirm_custom" translatable="true">确定输入，开始学习</string>
+    <string name="study_next" translatable="true">下一个</string>
+    <string name="more_times" translatable="true">再巩固两次</string>
+    <string name="exit_study" translatable="true">退出学习</string>
+
+    <string name="size_study_tip" translatable="true">
+        尺寸学习使用帮助\n与探索模式有所类似，你使读屏聚焦于手指触摸区域，并双击长按以激活屏幕测量，之后再放置两根手指并缓慢移动；或者标记位姿状态后缓慢移动手机。在你移动了所要学习的尺寸后，手机将振动提示。
+    </string>
+    <string name="angle_study_tip" translatable="true">
+        角度学习使用帮助\n与探索模式有所类似，你可以标记手机初始位姿状态，然后绕手机的某一个正交方向轴旋转。在你旋转了要学习的尺寸后，手机将振动提示。注意不要随意在多个轴向上发生明显旋转。
+    </string>
+    <string name="test_tip" translatable="true">
+        测试模式使用帮助\n与探索模式有所类似，你可以双击并按住屏幕中央以激活屏幕测量，然后放置两根手指；或者两次标记手机的位姿状态。系统将评判你做出的尺寸或角度是否达标。
+    </string>
+
+    <string name="tip_has_read" translatable="true">继续</string>
+
+    <string name="exit_test" translatable="true">退出测试</string>
+    <string name="test_over" translatable="true">测试完成</string>
+</resources>
