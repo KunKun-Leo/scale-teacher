@@ -9,58 +9,35 @@
     android:keepScreenOn="true">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        style="@style/OptionList"
+        tools:ignore="MissingConstraints">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:id="@+id/start_formal_teaching"
+            style="@style/BlackBlock"
             android:layout_weight="1"
-            android:background="@color/black"
-            android:gravity="center"
             android:text="@string/start_option1"
-            android:textColor="@color/white"
-            android:textSize="96sp"
-            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="@string/start_option1_description"
-            android:onClick="openMeasureOption" />
+            android:onClick="chooseStartOption" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:id="@+id/start_free_teaching"
+            style="@style/WhiteBlock"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:gravity="center"
             android:text="@string/start_option2"
-            android:textColor="@color/black"
-            android:textSize="96sp"
-            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="@string/start_option2_description"
-            android:onClick="openStudyOption" />
+            android:onClick="chooseStartOption" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:id="@+id/start_test"
+            style="@style/BlackBlock"
             android:layout_weight="1"
-            android:background="@color/black"
-            android:gravity="center"
             android:text="@string/start_option3"
-            android:textColor="@color/white"
-            android:textSize="96sp"
-            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="@string/start_option3_description"
-            android:onClick="startTestActivity" />
+            android:onClick="chooseStartOption" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

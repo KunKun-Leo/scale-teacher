@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".main.InputStudyContentActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/input_page_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_size"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/study_goal_edit"
+                android:layout_width="300dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="48dp"
+                android:hint="@string/input_size_hint"
+                android:textSize="16sp"
+                android:inputType="number"
+                android:theme="@style/EditText"
+                android:textColor="@color/white"/>
+
+            <Button
+                android:layout_width="300dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="48sp"
+                android:text="@string/confirm_input"
+                android:textStyle="bold"
+                android:background="@drawable/button_background_white"
+                android:theme="@style/BasicWhiteButton"
+                android:onClick="confirmInput" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/switch_to_size_formal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:theme="@style/SwitchTab"
+                android:text="@string/switch_to_size_formal"
+                android:onClick="switchStudyContent" />
+
+            <TextView
+                android:id="@+id/switch_to_angle_formal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:theme="@style/SwitchTab"
+                android:text="@string/switch_to_angle_formal"
+                android:onClick="switchStudyContent" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

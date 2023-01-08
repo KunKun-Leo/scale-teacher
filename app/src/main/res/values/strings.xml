@@ -1,12 +1,75 @@
 <resources>
     <string name="app_name">Scale Teacher</string>
 
+    <!--  StartOptionActivity  -->
+    <string name="start_option1" translatable="true">正式教学</string>
+    <string name="start_option2" translatable="true">自由教学</string>
+    <string name="start_option3" translatable="true">测一测</string>
+
+    <!--  IntroductionActivity  -->
+    <string name="size_formal_tip" translatable="true">尺寸正式教学说明</string>
+    <string name="angle_formal_tip" translatable="true">角度正式教学说明</string>
+    <string name="free_mode_tip" translatable="true">自由学习说明</string>
+    <string name="test_mode_tip" translatable="true">自由学习说明</string>
+
+    <string name="continue_button" translatable="true">继续</string>
+
+    <!--  Switch Footer of Formal Study  -->
+    <string name="switch_to_size_formal" translatable="true">尺寸学习</string>
+    <string name="switch_to_angle_formal" translatable="true">角度学习</string>
+
+    <!--  InputStudyContentActivity  -->
+    <string name="input_size" translatable="true">设定要学习的尺寸</string>
+    <string name="input_angle" translatable="true">设定要学习的角度</string>
+    <string name="input_size_hint" translatable="true">请输入整数尺寸，单位厘米</string>
+    <string name="input_angle_hint" translatable="true">请输入整数角度，单位度</string>
+
+    <string name="confirm_input" translatable="true">确定</string>
+
+    <string name="integer_parse_problem" translatable="true">请确保您输入的是一个整数</string>
+    <string name="size_range_problem" translatable="true">要学习的尺寸需要大于0厘米，不大于500厘米</string>
+    <string name="angle_range_problem" translatable="true">要学习的角度需要大于0度，不大于180度</string>
+
+
+    <!--  Switch Footer of Measure Method  -->
+    <string name="switch_to_single_finger" translatable="true">单指</string>
+    <string name="switch_to_two_fingers" translatable="true">双指</string>
+    <string name="switch_to_one_hand" translatable="true">单手</string>
+    <string name="switch_to_two_hands" translatable="true">双手</string>
+    <string name="switch_to_body" translatable="true">躯体</string>
+
+
+    <!--  FormalStudyActivity  -->
+    <string name="study_goal" translatable="true">正在学习</string>
+    <string name="last_try" translatable="true">上次尝试结果</string>
+    <string name="unknown_value" translatable="true">？？？</string>
+
+    <!--  Common: Finger Gestures  -->
+    <string name="hold_single_finger" translatable="true">已放下手指，请在原处保持3秒钟</string>
+    <string name="wait_second_finger" translatable="true">已放下一根手指，请再放下一根手指</string>
+    <string name="holding_two_fingers" translatable="true">已放下两根手指，请在原处保持3秒钟</string>
+
+    <string name="single_finger_activated" translatable="true">接下来，请将手指移动到屏幕上新位置后再保持3秒静止</string>
+    <string name="two_fingers_activated" translatable="true">接下来，请在屏幕上调整两指位置，再保持3秒静止</string>
+    <string name="one_hand_activated" translatable="true">接下来，请将移动手机到新位置之后保持3秒静止</string>
+    <string name="two_hands_activated" translatable="true">接下来，请调整握持手机的手与另一只手的间距，再保持3秒静止</string>
+    <string name="body_activated" translatable="true">接下来，请携带手机走动到新位置之后保持3秒静止</string>
+
+
+    <!--  Common: Problems  -->
+    <string name="too_many_fingers" translatable="true">您在屏幕上放下了太多手指，请全部抬起后重试</string>
+    <string name="invalid_gesture" translatable="true">当前手势无效，请重试</string>
+    <string name="activation_canceled" translatable="true">已取消</string>
+
+
+    <!--  **********************新旧内容分割线**********************************  -->
+
     <string name="start_option_page" translatable="true">欢迎使用Scale Teacher，请在以下三种模式中进行选择。</string>
-    <string name="start_option1" translatable="true">探索</string>
+
     <string name="start_option1_description" translatable="true">探索模式：进入此模式后，你可以自由测量尺寸或角度</string>
-    <string name="start_option2" translatable="true">学习</string>
+
     <string name="start_option2_description" translatable="true">学习模式：进入此模式后，你可以学习特定尺寸或角度对应的肢体感觉</string>
-    <string name="start_option3" translatable="true">测试</string>
+
     <string name="start_option3_description" translatable="true">测试模式：进入此模式后，你可以复习已经学习过的尺寸或角度</string>
 
     <string name="measure_option_page" translatable="true">已进入探索模式，请选择测量场景与方式。</string>

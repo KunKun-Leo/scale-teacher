@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/switch_to_size_formal"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:theme="@style/SwitchTab"
+        android:text="@string/switch_to_size_formal"
+        android:onClick="switchStudyContent" />
+
+    <TextView
+        android:id="@+id/switch_to_angle_formal"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:theme="@style/SwitchTab"
+        android:text="@string/switch_to_angle_formal"
+        android:onClick="switchStudyContent" />
+
+</LinearLayout>

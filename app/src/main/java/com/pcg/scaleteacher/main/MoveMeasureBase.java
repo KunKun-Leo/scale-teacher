@@ -37,6 +37,19 @@ public class MoveMeasureBase extends AppCompatActivity implements GLSurfaceView.
 
     protected TextToSpeech tts;
 
+    //学习阶段
+    protected enum StudyState {
+        FIRST_TRY,  //初次尝试阶段
+        CORRECTING,     //对初次尝试的纠正阶段
+        PRACTICING,     //反复练习阶段
+    }
+
+    //监听模式
+    protected enum WatchMode {
+        END_CHECK,  //末端检查模式：当用户执行完毕之后再判断结果是否符合正确
+        REAL_TIME   //实时检查模式：当用户执行过程中接近目标时予以提示
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,7 +165,6 @@ public class MoveMeasureBase extends AppCompatActivity implements GLSurfaceView.
         tts.setPitch(1.0f);
         tts.setSpeechRate(0.5f);
     }
-
 }
 
 class SimplePose {
@@ -201,6 +213,7 @@ class SimplePose {
                 + (this.z - another.z) * (this.z - another.z);
     }
 
+    /**********未完成************/
     public int[] calAngleChange(SimplePose original) {
         return new int[] {this.yaw - original.yaw, this.pitch - original.pitch, this.roll - original.roll};
     }

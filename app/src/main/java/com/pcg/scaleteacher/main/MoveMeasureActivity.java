@@ -21,6 +21,11 @@ public class MoveMeasureActivity extends MoveMeasureBase {
 
     private boolean isMeasuringLength;
 
+    private StudyState studyState;
+    private WatchMode watchMode;
+    private int practiceTimes;
+    private final int maxPracticeTime = 5;
+
     private SimplePose startPose = null;
     private SimplePose endPose = null;
 
@@ -29,6 +34,7 @@ public class MoveMeasureActivity extends MoveMeasureBase {
     private LinearLayout measureUI;
     private TextView tipContent;
 
+    private static final String activityTag = "MoveMeasureActivity";
     private static final String cameraProblem = "位置标记失败！请保证相机无遮挡后重试.";
     private static final String markProblem = "位置标记出现混乱，无法正确计算。请重新标记起始和结束状态.";
 
