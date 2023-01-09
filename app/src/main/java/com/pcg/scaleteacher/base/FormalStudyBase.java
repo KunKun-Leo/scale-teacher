@@ -2,6 +2,9 @@ package com.pcg.scaleteacher.base;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.UtteranceProgressListener;
+
+import com.pcg.scaleteacher.main.InputStudyContentActivity;
 
 /* 该类作为正式教学活动的基类，主要处理正式教学过程中的三环节流程 */
 public class FormalStudyBase extends CompletedFunctionBase {
@@ -13,6 +16,7 @@ public class FormalStudyBase extends CompletedFunctionBase {
     protected enum StudyState {
         FIRST_TRY,      //初次尝试阶段
         CORRECTING,     //对初次尝试的纠正阶段
+        CORRECTED,      //已经纠正完成，但还没有开始练习的中间阶段
         PRACTICING      //反复练习阶段
     }
     protected StudyState currentStudyState = StudyState.FIRST_TRY;
@@ -56,5 +60,33 @@ public class FormalStudyBase extends CompletedFunctionBase {
 
     public static float getSpatialToleranceB(int studyGoal) {
         return studyGoal > 100 ? (float) (studyGoal * 0.15f) : 15f;
+    }
+
+    @Override
+    protected void initTextToSpeech() {
+        super.initTextToSpeech();
+
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {}
+
+            @Override
+            public void onDone(String utteranceId) {
+                if (utteranceId.equals("formalStudySuccess") || utteranceId.equals("formalStudyComplete")) {
+                    runOnUiThread(() -> returnToInput());
+                }
+            }
+
+            @Override
+            public void onError(String utteranceId) {}
+        });
+    }
+
+    protected void returnToInput() {
+        Intent intent = new Intent(this, InputStudyContentActivity.class);
+        intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
+        intent.putExtra(studyContentTag, currentStudyContent);
+        startActivity(intent);
+        finish();
     }
 }

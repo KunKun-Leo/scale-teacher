@@ -46,14 +46,17 @@
 
     <string name="formal_study_success" translatable="true">学习完成，请设置新的学习目标吧</string>
     <string name="formal_study_complete" translatable="true">本轮学习到此结束，下次继续吧</string>
+    <string name="start_correction" translatable="true">现在请调整距离，等待振动提示</string>
+    <string name="practice_again" translatable="true">现在再来一次吧！</string>
+    <string name="start_practice" translatable="true">记住这个距离吗？下面再尝试自己做一次吧！</string>
 
     <!--  Common: Finger Gestures  -->
-    <string name="hold_single_finger" translatable="true">已放下手指，请在原处保持3秒钟</string>
-    <string name="wait_second_finger" translatable="true">已放下一根手指，请再放下一根手指</string>
-    <string name="holding_two_fingers" translatable="true">已放下两根手指，请在原处保持3秒钟</string>
+    <string name="hold_single_finger" translatable="true">请将手指在原处保持3秒钟</string>
+    <string name="wait_second_finger" translatable="true">请放下第二根手指</string>
+    <string name="holding_two_fingers" translatable="true">请将两指在原处保持3秒钟</string>
 
     <string name="single_finger_activated" translatable="true">接下来，请将手指移动到屏幕上新位置后再保持3秒静止</string>
-    <string name="two_fingers_activated" translatable="true">接下来，请在屏幕上调整两指位置，再保持3秒静止</string>
+    <string name="two_fingers_activated" translatable="true">接下来，请在屏幕上调整两指间距，再保持3秒静止</string>
     <string name="one_hand_activated" translatable="true">接下来，请将移动手机到新位置之后保持3秒静止</string>
     <string name="two_hands_activated" translatable="true">接下来，请调整握持手机的手与另一只手的间距，再保持3秒静止</string>
     <string name="body_activated" translatable="true">接下来，请携带手机走动到新位置之后保持3秒静止</string>
@@ -64,5 +67,6 @@
     <string name="invalid_gesture" translatable="true">当前手势无效，请重试</string>
     <string name="activation_canceled" translatable="true">已取消</string>
     <string name="unknown_problem" translatable="true">测量失败，请重试</string>
+    <string name="vibrator_problem" translatable="true">手机振动功能似乎不可用</string>
 
 </resources>

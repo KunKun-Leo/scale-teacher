@@ -39,7 +39,8 @@ public class HelloAR
     private int previousInputFrameIndex = -1;
     private byte[] imageBytes = null;
 
-    private float[] translation = new float[3];
+    private float[] translation = new float[3];     //位移偏移量
+    private float[] quaternion = new float[4];      //旋转四元数
 
     private InputFrame inputFrame;
 
@@ -254,15 +255,28 @@ public class HelloAR
         return  matrix;
     }
 
-    private void calWorldCoordinates(Matrix44F cameraToWorld) {
+    private void calWorldPose(Matrix44F cameraToWorld) {
         float[] data = cameraToWorld.data;
+
+        //计算translation
         translation[0] = data[3];
         translation[1] = data[7];
         translation[2] = data[11];
+
+        //计算quaternion
+        float rotationTrace = data[0] + data[5] + data[10]; //计算旋转矩阵（左上3×3矩阵）的迹
+        quaternion[3] = (float) (Math.sqrt(rotationTrace + 1) / 2);     // w
+        quaternion[0] = ( data[9] - data[6] ) / (4 * quaternion[3]);     //x
+        quaternion[1] = ( data[1] - data[8] ) / (4 * quaternion[3]);     //y
+        quaternion[2] = ( data[4] - data[1] ) / (4 * quaternion[3]);     //z
     }
 
     public float[] getTranslation() {
         return translation;
+    }
+
+    public float[] getQuaternion() {
+        return quaternion;
     }
 
     private void calRotation() {
@@ -291,26 +305,6 @@ public class HelloAR
         Matrix44F imageProjection = cameraParameters.imageProjection(viewport_aspect_ratio, screenRotation, true, false);
         Image image = iframe.image();
 
-        //Matrix44F transformMatrix = iframe.cameraTransform();
-        //float[] data = transformMatrix.data;
-        /*StringBuffer stringBuffer = new StringBuffer();
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                stringBuffer.append(data[i * 4 + j]).append(" ");
-            }
-            stringBuffer.append("\n");
-        }
-        Log.e("Debug", stringBuffer.toString());*/
-
-        //SimpleMatrix worldToCameraMatrix = new SimpleMatrix(4, 4, true, data);
-        //SimpleMatrix cameraToWorldMatrix = worldToCameraMatrix.invert();
-        //final float[] cameraCoordinatesData = new float[]{0, 0, 0, 1};
-        //final SimpleMatrix cameraCoordinates = new SimpleMatrix(4, 1, true, cameraCoordinatesData);
-        //SimpleMatrix worldCoordinates = cameraToWorldMatrix.mult(cameraCoordinates);
-        //Log.e("Debug", worldToCameraMatrix.toString());
-
-
-
         try {
             if (iframe.index() != previousInputFrameIndex) {
                 Buffer buffer = image.buffer();
@@ -334,7 +328,7 @@ public class HelloAR
                 if (boxRenderer != null) {
                     boxRenderer.render(projectionMatrix, transformInverse, new Vec3F(0.2f, 0.2f, 0.2f));
                 }
-                calWorldCoordinates(transformInverse);
+                calWorldPose(transformInverse);
                 //Log.e("Debug", String.valueOf(worldCoordinates[0]) + " " + String.valueOf(worldCoordinates[1]) + " " + String.valueOf(worldCoordinates[2]));
             }
         } finally {

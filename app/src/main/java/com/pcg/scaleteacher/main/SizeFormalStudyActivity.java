@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -61,9 +62,7 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
         int viewId = view.getId();
 
         int targetMethod = SizeMeasureMethod.SINGLE_FINGER;
-        if (viewId == R.id.switch_to_single_finger)
-            targetMethod = SizeMeasureMethod.SINGLE_FINGER;
-        else if (viewId == R.id.switch_to_two_fingers)
+        if (viewId == R.id.switch_to_two_fingers)
             targetMethod = SizeMeasureMethod.TWO_FINGERS;
         else if (viewId == R.id.switch_to_one_hand)
             targetMethod = SizeMeasureMethod.ONE_HAND;
@@ -154,7 +153,6 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
                 //如果在单指测距等待激活的阶段手指发生了明显位移，则认为激活失败
                 if (currentActivationState == ActivationState.FINGER_ACTIVATING) {
                     if (Math.abs(xDiff1) > holdingPositionLimit || Math.abs(yDiff1) > holdingPositionLimit) {
-                        Log.e("Debug", "1");
                         tts.speak(getString(R.string.invalid_gesture), TextToSpeech.QUEUE_FLUSH, null, "invalidGesture");
                         currentActivationState = ActivationState.UNACTIVATED;
                         endHolding();
@@ -165,7 +163,6 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
                 if (currentActivationState == ActivationState.ACTIVATED) {
                     if (Math.abs(xDiff1) > holdingPositionLimit || Math.abs(yDiff1) > holdingPositionLimit) {
                         originalFinger1.update(currentFinger1.getX(), currentFinger1.getY());
-                        Log.e("Debug", "abc");
                         startHolding();
                     }
                 }
@@ -238,6 +235,9 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
 
         endHolding();
         currentActivationState = ActivationState.UNACTIVATED;
+
+        if (currentStudyState == StudyState.CORRECTED)
+            currentStudyState = StudyState.PRACTICING;
 
         int index = e.getActionIndex();
         int pointerId = e.getPointerId(index);
@@ -320,9 +320,48 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
                     }
                 }
             }
-            //如果当前正在矫正阶段且测距功能已激活，则需要实时监测当前做出的长度，以确认是否达标
+            //如果当前正在矫正阶段且测距功能已激活，则需要实时监测当前做出的长度，以确认是否达标；并且在达标之后提示转入练习阶段
             if (currentStudyState == StudyState.CORRECTING) {
                 /************待补充**************/
+                switch (currentMeasureMethod) {
+                    case SizeMeasureMethod.SINGLE_FINGER:
+                        if (Math.abs(currentFinger1.calPhysicDistance(fingerPosition1, dpi) - studyGoal) < fingerToleranceA) {
+                            startVibrator();
+                            if (Math.abs(currentFinger1.getX() - originalFinger1.getX()) > holdingPositionLimit
+                                    || Math.abs(currentFinger1.getY() - originalFinger1.getY()) > holdingPositionLimit) {
+                                startHolding();
+                                originalFinger1.update(currentFinger1.getX(), currentFinger1.getY());
+                            }
+                        }
+                        if (holdingTime > holdingTimeLimitD) {
+                            tts.speak(getString(R.string.start_practice), TextToSpeech.QUEUE_FLUSH, null, "startPractice");
+                            currentStudyState = StudyState.CORRECTED;
+                        }
+                    case SizeMeasureMethod.TWO_FINGERS:
+                        if (Math.abs(currentFinger1.calPhysicDistance(currentFinger2, dpi) - studyGoal) < fingerToleranceA) {
+                            startVibrator();
+                            if (Math.abs(currentFinger1.getX() - originalFinger1.getX()) > holdingPositionLimit
+                                    || Math.abs(currentFinger1.getY() - originalFinger1.getY()) > holdingPositionLimit) {
+                                startHolding();
+                                originalFinger1.update(currentFinger1.getX(), currentFinger1.getY());
+                            }
+                            if (Math.abs(currentFinger2.getX() - originalFinger2.getX()) > holdingPositionLimit
+                                    || Math.abs(currentFinger2.getY() - originalFinger2.getY()) > holdingPositionLimit) {
+                                startHolding();
+                                originalFinger2.update(currentFinger2.getX(), currentFinger2.getY());
+                            }
+                        }
+                        if (holdingTime > holdingTimeLimitD) {
+                            tts.speak(getString(R.string.start_practice), TextToSpeech.QUEUE_FLUSH, null, "startPractice");
+                            currentStudyState = StudyState.CORRECTED;
+                        }
+                        break;
+                    case SizeMeasureMethod.ONE_HAND:
+                    case SizeMeasureMethod.TWO_HANDS:
+                    case SizeMeasureMethod.BODY:
+                        /************待补充**************/
+                        break;
+                }
             }
         }
     }
@@ -336,22 +375,30 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
                     tts.speak(getString(R.string.unknown_problem), TextToSpeech.QUEUE_FLUSH, null, "unknownProblem");
                     return;
                 }
+
                 float fingerDistance = fingerPosition1.calPhysicDistance(fingerPosition2, dpi);
+                TextView lastTryValue = findViewById(R.id.last_try_value);
+                lastTryValue.setText(String.format("%.1f厘米", fingerDistance));
+
                 tts.speak(MeasureReportBuilder.buildFormalReport(fingerDistance, studyGoal, currentMeasureMethod),
                         TextToSpeech.QUEUE_FLUSH, null, "result");
+
                 if (Math.abs(fingerDistance - studyGoal) <= fingerToleranceA) {
                     tts.speak(getString(R.string.formal_study_success), TextToSpeech.QUEUE_ADD, null, "formalStudySuccess");
-                    Intent intent = new Intent(this, InputStudyContentActivity.class);
-                    intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
-                    intent.putExtra(studyContentTag, currentStudyContent);
-                    startActivity(intent);
-                    finish();
                     return;
                 }
-                if (currentStudyState == StudyState.PRACTICING) {
+                else if (currentStudyState == StudyState.FIRST_TRY) {
+                    tts.speak(getString(R.string.start_correction), TextToSpeech.QUEUE_ADD, null, "");
+                    currentStudyState = StudyState.CORRECTING;
+                    practiceCounter = 0;
+                }
+                else if (currentStudyState == StudyState.PRACTICING) {
                     practiceCounter++;
                     if (practiceCounter >= practiceLimit) {
-                        tts.speak(getString(R.string.formal_study_complete), TextToSpeech.QUEUE_FLUSH, null, "formalStudyComplete");
+                        tts.speak(getString(R.string.formal_study_complete), TextToSpeech.QUEUE_ADD, null, "formalStudyComplete");
+                    }
+                    else {
+                        tts.speak(getString(R.string.practice_again), TextToSpeech.QUEUE_ADD, null, "practiceAgain");
                     }
                 }
                 break;

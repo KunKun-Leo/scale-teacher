@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -38,13 +39,18 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected int currentStudyContent;
     protected int currentMeasureMethod;
 
-
     //计时相关变量，用于检测各种动作是否达到了一定时间
-    Handler timeHandler;
-    Runnable timeRunnable;
+    private Handler timeHandler;
+    private Runnable timeRunnable;
     private static final int timerInterval = 50;    //每50毫秒启动一次定时任务
 
-    protected TextToSpeech tts;     //语音提示功能模块
+    //语音提示功能模块
+    protected TextToSpeech tts;
+
+    //振动功能模块
+    protected Vibrator vibrator;
+    protected boolean isVibrating;
+    private Handler vibrationHandler;
 
 
     //需要额外启动的功能模块
@@ -64,30 +70,37 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected FingerPosition currentFinger2;   //第二根手指当前位置
     protected FingerPosition originalFinger1;   //第一根手指原始位置
     protected FingerPosition originalFinger2;   //第二根手指原始位置
-    protected int holdingTime = 0;      //在某一个位置上保持不动时间计数
+    protected int holdingTime = 0;      //手指在某一个位置上保持不动时间计数
     protected boolean isHolding;        //指示是否开始holdingTime计数
     protected int fingerCounter = 0;    //手指（不包括无障碍模式下额外使用的手指）个数
     protected static final int holdingPositionLimit = 100;   //判定未发生明显移动的距离要求
     protected static final int sweepPositionLimit = 200;    //判定下滑的距离要求
-    protected static final int holdingTimeLimitA = (int) (3000 / timerInterval);    //时间计数要求A = 3000ms
-    protected static final int holdingTimeLimitB = (int) (5000 / timerInterval);    //时间计数要求B = 5000ms
-    protected static final int holdingTimeLimitC = (int) (3000 / timerInterval);    //时间计数要求C = 3000ms
+    protected static final int holdingTimeLimitA = (int) (3000 / timerInterval);    //时间计数要求A = 3000ms，启动手指测量的时间要求
+    protected static final int holdingTimeLimitB = (int) (5000 / timerInterval);    //时间计数要求B = 5000ms，启动单手/双手/躯体移动测量的时间要求
+    protected static final int holdingTimeLimitC = (int) (3000 / timerInterval);    //时间计数要求C = 3000ms，确认当前测距结果的时间要求
+    protected static final int holdingTimeLimitD = (int) (5000 / timerInterval);    //时间计数要求D = 5000ms，矫正阶段保持稳定的时间要求
 
     //屏幕手指测量功能所需要的相关变量
     protected FingerPosition fingerPosition1;
     protected FingerPosition fingerPosition2;
     protected int dpi;
-    public static final float fingerToleranceA = 1f;    //不超过此误差，就认为满足要求了）
-    public static final float fingerToleranceB = 2f;    //超过此误差，就认为差得有点多了
+    public static final float fingerToleranceA = 0.5f;    //不超过此误差，就认为满足要求了）
+    public static final float fingerToleranceB = 1.5f;    //超过此误差，就认为差得有点多了
 
     //运动跟踪功能需要的相关变量
     protected static String key = "kj+cN5YshCuOShdS83GW7ZDmU61NyOdUPoG0TKINqhyWHawBohC7TO1cowKuS/5e4Ub8LuZI/EC0EaJM+1yiD6QKqhycG7Yns1z1X/tcowe0G6Edsg3tVIwF7QyiEKsCsjerHfVElDP7XLkPpReuAKMN7VSMXKwBuhO6AL4KtkyKUu0eux+7CLgMoh31RJRMoBehCrgJvEz7XKIPtFySQvUToAqiEqod9USUTKQboR2yUIYDthmqOqUfrAW+EKhM+1y8C7kNqkCUEqAbsyyqDbgZoQejF6AA9VLtHbIQvAv5LKoNuAyrB7kZ7UL1DaoApBvhIbUUqg2jKr0PtBWmALBc40ykG6EdslCcG6UYrg2yKr0PtBWmALBc40ykG6EdslCcHrYMvAuEDq4avh+jI7YO7UL1DaoApBvhI7gKpgG5Kr0PtBWmALBc40ykG6EdslCLC7kNqj2nH7sHthKCD6dc40ykG6EdslCML5MqvQ+0FaYAsFySQvUbtx6+DKo6vhOqPaMfoh71RKEbuxLjTL4NgwG0H6NM7RiuAqQbskKsXK0buRqjC54avEztJe0NuBPhHrQZ4R20H6MLoxuuDb8bvUyKUu0YtgymD7kKvEztJe0NuBOiG7kXuxf1I+NMpxKuGrERvQOkXPU19R+hCqURpgr1I+NMuhGrG7sbvEztJe0dshC8C/k3og+wG5scth2kB7kZ7UL1DaoApBvhLbsRugqFG6wBsBCmGr4RoUz7XLwLuQ2qQIUbrAGlGqYAsFzjTKQboR2yUIAMvRusGoMMrg28F6EJ9VLtHbIQvAv5LbocsR+sC4MMrg28F6EJ9VLtHbIQvAv5Lb8PpQ2qPacfuwe2EoIPp1zjTKQboR2yUIIBoxegAIMMrg28F6EJ9VLtHbIQvAv5OqoApBucHrYKpg+7M64e9VLtHbIQvAv5PY4qgwyuDbwXoQn1I+NMsga/B6Ubmwe6G5wathO/TO0QugK7Uu0HpDKgDbYS7VSxH6MdsgPjFfUcugCzEqonsw3tVIxc7TP7XLkPpReuAKMN7VSMXKwBuhO6AL4KtkyKUu0eux+7CLgMoh31RJRMvhG8TIpS7QO4GroCsg3tVIxcvAu5DapAnhOuCbIqvQ+0FaYAsFzjTKQboR2yUIwCuAurPLIdoAm5F7sHuBDtQvUNqgCkG+E8sh2gHLMXoQn1Uu0dshC8C/kxrQSyHbs6pR+sBb4QqEz7XLwLuQ2qQIQLvQi2Hao6pR+sBb4QqEz7XLwLuQ2qQIQOrhykG5wetgqmD7szrh71Uu0dshC8C/kzoBq+EaE6pR+sBb4QqEz7XLwLuQ2qQJMboR2yLb8PoxeuApofv0z7XLwLuQ2qQJQ/izqlH6wFvhCoTIpS7QuvDqYcsiqmA7Ituw+6Du1UuQujAvtcph2bEawPu1z1CLYSvAuqI7J45/UTMdos/ZxNl3SuEOyeYqcSjv71OCIrnzGsxIQRrrKNVsa2fx0EyMyqOV+wKtQxUsBCyvS/THZr42L1rTi63KT7aw/ZIP/PjyxMtimvdW+4Z7F2CWbLLh934iQyEGn98kbZ5Z8vZTHuMYGALezVAyfE2qbY6N9uv0dAQGQpYtnSDW1dfeOP2yQu3j3Y6nSF1Wm1IiT+kDWDGNoQTwjC+ciQZjQzuDMHpscMbsjPjoqKfsp12+mDLEkAuihzeCYr4ltW4afef1J7+Bnx+mR+qoZGLvgRJvoeCsHrl8bkDUfU5DRhZasr/ageJUATkjkm3V9xjrj2HPEYLfvXfs9u";
     protected GLView glView;
     protected CalibrationDownloader downloader;
-
+    protected SpatialPoseList recentPoses;  //缓存最近的几次运动跟踪结果，以减少误差
+    protected SpatialPose originalPose;     //运动跟踪原始值（主要用于判断用户运动是否停下来了）
+    protected SpatialPose currentPose;      //当前运动跟踪
     protected SpatialPose spatialPose1;
     protected SpatialPose spatialPose2;
+    protected boolean isRealTimeTracking;   //开启之后，会不断向recentPose内置入当前跟踪的位姿
+    protected int steadyTime = 0;   //在某一个位姿保持不动时间计数
+    protected boolean isSteady;     //指示是否开始steadyTime计数
     //运动跟踪的误差实际上不是一个常数，需要Activity自己实现计算
+    protected static final int steadyTImeLimitA = (int) (3000 / timerInterval);     //时间计数要求A = 5000ms，判定手机不再明显移动的时间要求
     protected float spatialToleranceA = 5f;
     protected float spatialToleranceB = 15f;
 
@@ -104,6 +117,7 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         super.onCreate(savedInstanceState);
 
         initTextToSpeech();
+        initVibrator();
         identifyFunctionType();    //识别需要相应的功能模块
         initTimer();        //启动伪定时器
         initFingerDetection();      //初始化手势检测相关的变量
@@ -196,10 +210,33 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected boolean onFingerMove(MotionEvent e) {return false;}  //当手指移动时触发
 
 
-    private void initTextToSpeech() {
+    protected void initTextToSpeech() {
         tts = new TextToSpeech(this, this);
         tts.setPitch(1.0f);
         tts.setSpeechRate(1f);
+    }
+
+    private void initVibrator() {
+        vibrator = (Vibrator) this.getSystemService(CompletedFunctionBase.VIBRATOR_SERVICE);
+        isVibrating = false;
+        vibrationHandler = new Handler();
+    }
+
+    protected void startVibrator() {
+        if (!isVibrating) {
+            isVibrating = true;
+            if (vibrator == null)
+                tts.speak(getString(R.string.vibrator_problem), TextToSpeech.QUEUE_FLUSH, null, "vibratorProblem");
+            else
+                vibrator.vibrate(1000);
+            vibrationHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    isVibrating = false;
+                }
+            }, 1000);
+        }
+
     }
 
     private void identifyFunctionType() {
@@ -251,8 +288,13 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     }
 
     protected void onTimerTick() {
-        if(isHolding)
+        if (isHolding)
             holdingTime++;
+        if (isSteady)
+            steadyTime++;
+        if (isRealTimeTracking && glView != null && recentPoses != null) {
+            recentPoses.addPose(new SpatialPose(glView.getTranslation(), glView.getQuaternion()));
+        }
     }
 
     private void initFingerDetection() {
@@ -347,7 +389,34 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
                 });
             }
         });
+
+        recentPoses = new SpatialPoseList(20);
+        originalPose = new SpatialPose();
+        currentPose = new SpatialPose();
+        spatialPose2 = new SpatialPose();
     }
+
+    public void startSteady() {
+        isSteady = true;
+        steadyTime = 0;
+    }
+
+    public void endSteady() {
+        isSteady = false;
+        steadyTime = 0;
+    }
+
+    public void startRealTimeMotionTracking() {
+        isRealTimeTracking = true;
+    }
+
+    public void endRealTimeMotionTracking() {
+        isRealTimeTracking = false;
+        if (recentPoses != null)
+            recentPoses.clear();
+    }
+
+
 
     //以下若干是与运动跟踪功能有关的函数和变量
     private interface PermissionCallback

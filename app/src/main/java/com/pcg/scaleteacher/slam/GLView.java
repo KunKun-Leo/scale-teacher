@@ -37,7 +37,8 @@ public class GLView extends GLSurfaceView
 
     private HelloAR helloAR;
 
-    private TextView textViewX, textViewY, textViewZ;
+    private float[] translation;    //helloAR传递过来的位移量的值，需要由Activity通过getTranslation()获取
+    private float[] quaternion;     //helloAR传递过来的旋转四元数的值，需要由Activity通过getQuaternion()获取
 
     public GLView(Context context)
     {
@@ -75,11 +76,21 @@ public class GLView extends GLSurfaceView
                 if (!initialized) { return; }
                 helloAR.render(width, height, GetScreenRotation());
 
-                float[] translation = helloAR.getTranslation();
+                //读取运动跟踪结果
+                translation = helloAR.getTranslation();
+                quaternion = helloAR.getQuaternion();
             }
         });
         this.setZOrderMediaOverlay(true);
 
+    }
+
+    public float[] getTranslation() {
+        return translation;
+    }
+
+    public float[] getQuaternion() {
+        return quaternion;
     }
 
     private Activity getActivity()
