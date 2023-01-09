@@ -258,10 +258,10 @@ public class HelloAR
     private void calWorldPose(Matrix44F cameraToWorld) {
         float[] data = cameraToWorld.data;
 
-        //计算translation
-        translation[0] = data[3];
-        translation[1] = data[7];
-        translation[2] = data[11];
+        //计算translation（从米转换为厘米）
+        translation[0] = data[3] * 100;
+        translation[1] = data[7] * 100;
+        translation[2] = data[11] * 100;
 
         //计算quaternion
         float rotationTrace = data[0] + data[5] + data[10]; //计算旋转矩阵（左上3×3矩阵）的迹

@@ -1,5 +1,7 @@
 package com.pcg.scaleteacher.base;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 
 /* 该类封装实现了空间位姿信息的定容量队列 */
@@ -45,7 +47,7 @@ public class SpatialPoseList {
         totalYaw += pose.getYaw();
         totalPitch += pose.getPitch();
         totalRoll += pose.getRoll();
-        size--;
+        size++;
 
         return size;
     }

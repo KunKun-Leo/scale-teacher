@@ -3,7 +3,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:contentDescription="@string/switch_footer">
 
     <TextView
         android:id="@+id/switch_to_size_formal"

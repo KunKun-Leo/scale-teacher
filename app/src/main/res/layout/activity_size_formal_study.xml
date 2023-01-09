@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.SizeFormalStudyActivity">
+    tools:context=".main.SizeFormalStudyActivity"
+    android:keepScreenOn="true">
 
     <FrameLayout
         android:id="@+id/preview"
@@ -19,17 +20,20 @@
         android:gravity="center">
 
         <LinearLayout
+            android:id="@+id/gesture_detection_area"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:contentDescription="@string/gesture_detection_area">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:importantForAccessibility="noHideDescendants">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -57,7 +61,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:importantForAccessibility="noHideDescendants">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -86,7 +91,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:background="@color/white">
+            android:background="@color/white"
+            android:contentDescription="@string/switch_footer">
 
             <TextView
                 android:id="@+id/switch_to_single_finger"

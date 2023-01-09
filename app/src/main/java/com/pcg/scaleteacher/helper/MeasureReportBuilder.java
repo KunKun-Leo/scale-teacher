@@ -25,7 +25,7 @@ public class MeasureReportBuilder {
             case SizeMeasureMethod.BODY:
                 toleranceA = FormalStudyBase.getSpatialToleranceA(goal);
                 toleranceB = FormalStudyBase.getSpatialToleranceB(goal);
-                report = report + (int) result + "厘米";
+                report = report + (int) result + "厘米。";
                 break;
             default:
                 return "";

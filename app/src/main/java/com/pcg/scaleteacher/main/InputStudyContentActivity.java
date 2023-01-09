@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
 
     private TextToSpeech tts;
     private int currentStudyContent;
+    private int studyGoal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +71,6 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
 
     public void confirmInput(View view) {
         EditText editText = findViewById(R.id.study_goal_edit);
-        int studyGoal;
         Intent intent;
         try {
             studyGoal = Integer.parseInt(editText.getText().toString());
@@ -84,26 +85,36 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
                     tts.speak(getString(R.string.size_range_problem), TextToSpeech.QUEUE_FLUSH, null, "integerParseProblem");
                     return;
                 }
-                intent = new Intent(this, SizeFormalStudyActivity.class);
-                intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
-                intent.putExtra(studyContentTag, StudyContent.STUDY_SIZE);
-                intent.putExtra(studyGoalTag, studyGoal);
-                startActivity(intent);
+                tts.speak(String.format("即将开始学习%d厘米", studyGoal), TextToSpeech.QUEUE_FLUSH, null, "sizeGoalConfirmed");
+                //上述播报完成之后，会自动执行startSizeFormalStudy()
                 break;
             case StudyContent.STUDY_ANGLE:
                 if (studyGoal <= 0 || studyGoal > 180) {
                     tts.speak(getString(R.string.angle_range_problem), TextToSpeech.QUEUE_FLUSH, null, "integerParseProblem");
                     return;
                 }
-//                intent = new Intent(this, SizeFormalStudyActivity.class);
-//                intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
-//                intent.putExtra(studyContentTag, StudyContent.STUDY_SIZE);
-//                intent.putExtra(studyGoalTag, studyGoal);
-//                startActivity(intent);
+                tts.speak(String.format("即将开始学习%d度", studyGoal), TextToSpeech.QUEUE_FLUSH, null, "angleGoalConfirmed");
+                //上述播报完成之后，会自动执行startAngleFormalStudy()
                 break;
             default:
                 break;
         }
+    }
+
+    private void startSizeFormalStudy() {
+        Intent intent = new Intent(this, SizeFormalStudyActivity.class);
+        intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
+        intent.putExtra(studyContentTag, StudyContent.STUDY_SIZE);
+        intent.putExtra(studyGoalTag, studyGoal);
+        startActivity(intent);
+    }
+
+    private void startAngleFormalStudy() {
+        Intent intent = new Intent(this, SizeFormalStudyActivity.class);
+        intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
+        intent.putExtra(studyContentTag, StudyContent.STUDY_ANGLE);
+        intent.putExtra(studyGoalTag, studyGoal);
+        startActivity(intent);
     }
 
     public void switchStudyContent(View view) {
@@ -140,6 +151,21 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
         tts = new TextToSpeech(this, this);
         tts.setPitch(1.0f);
         tts.setSpeechRate(1f);
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {}
+
+            @Override
+            public void onDone(String utteranceId) {
+                if (utteranceId.equals("sizeGoalConfirmed"))
+                    runOnUiThread(() -> startSizeFormalStudy());
+                else if (utteranceId.equals("angleGoalConfirmed"))
+                    runOnUiThread(() -> startAngleFormalStudy());
+            }
+
+            @Override
+            public void onError(String utteranceId) {}
+        });
     }
 
 }

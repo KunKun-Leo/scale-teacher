@@ -14,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.pcg.scaleteacher.R;
@@ -72,7 +73,11 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected FingerPosition originalFinger2;   //第二根手指原始位置
     protected int holdingTime = 0;      //手指在某一个位置上保持不动时间计数
     protected boolean isHolding;        //指示是否开始holdingTime计数
-    protected int fingerCounter = 0;    //手指（不包括无障碍模式下额外使用的手指）个数
+    protected boolean finger1Ready;     //第一根手指已在屏幕上
+    protected boolean finger2Ready;     //第二根手指已在屏幕上
+    protected int finger1Id;        //手指在触摸事件中的pointerId；当开启了读屏服务时，需要额外有一根手指先用来按住手势监测区域
+    protected int finger2Id;        //
+    //protected int fingerCounter = 0;    //手指（不包括无障碍模式下额外使用的手指）个数
     protected static final int holdingPositionLimit = 100;   //判定未发生明显移动的距离要求
     protected static final int sweepPositionLimit = 200;    //判定下滑的距离要求
     protected static final int holdingTimeLimitA = (int) (3000 / timerInterval);    //时间计数要求A = 3000ms，启动手指测量的时间要求
@@ -99,8 +104,10 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected boolean isRealTimeTracking;   //开启之后，会不断向recentPose内置入当前跟踪的位姿
     protected int steadyTime = 0;   //在某一个位姿保持不动时间计数
     protected boolean isSteady;     //指示是否开始steadyTime计数
+    protected static final int steadyDistanceLimit = 5;     //判定手机相对静止的距离要求
+    protected static final int steadyTimeLimitA = (int) (3000 / timerInterval);     //时间计数要求A = 5000ms，判定手机不再明显移动的时间要求
+    protected static final int steadyTimeLimitB = (int) (5000 / timerInterval);    //时间计数要求B = 5000ms，矫正阶段保持稳定的时间要求
     //运动跟踪的误差实际上不是一个常数，需要Activity自己实现计算
-    protected static final int steadyTImeLimitA = (int) (3000 / timerInterval);     //时间计数要求A = 5000ms，判定手机不再明显移动的时间要求
     protected float spatialToleranceA = 5f;
     protected float spatialToleranceB = 15f;
 
@@ -116,6 +123,8 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        hasScreenReader = ScreenReaderCheckHelper.check(this);  //不要轻易移到后面去！initFingerDetection()需要用到它的值
+
         initTextToSpeech();
         initVibrator();
         identifyFunctionType();    //识别需要相应的功能模块
@@ -123,7 +132,6 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         initFingerDetection();      //初始化手势检测相关的变量
         initScreenTouching();       //按需启动屏幕触摸测距功能
         //initMotionTracking();     由于涉及获取界面元素，运动跟踪功能必须由具体Activity设置好布局之后再启动
-        hasScreenReader = ScreenReaderCheckHelper.check(this);
     }
 
     @Override
@@ -184,7 +192,7 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        int index = e.getActionIndex();
+        //int index = e.getActionIndex();
         switch (e.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 return onFirstFingerDown(e);
@@ -303,7 +311,17 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         originalFinger1 = new FingerPosition();
         originalFinger2 = new FingerPosition();
         holdingTime = 0;
-        fingerCounter = 0;
+        finger1Ready = false;
+        finger2Ready = false;
+
+        if (hasScreenReader) {
+            finger1Id = 1;
+            finger2Id = 2;
+        }
+        else {
+            finger1Id = 0;
+            finger2Id = 1;
+        }
     }
 
     //holdingTime开始计数
@@ -393,6 +411,7 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         recentPoses = new SpatialPoseList(20);
         originalPose = new SpatialPose();
         currentPose = new SpatialPose();
+        spatialPose1 = new SpatialPose();
         spatialPose2 = new SpatialPose();
     }
 
