@@ -92,9 +92,9 @@ public class SpatialPose {
                 + (this.z - another.z) * (this.z - another.z);
     }
 
-    public int[] calAngleChange(SpatialPose original) {
+    public int calAngleChange(SpatialPose original) {
         /************这种计算方式有很大问题！还需要完善************/
-        return new int[] {this.yaw - original.yaw, this.pitch - original.pitch, this.roll - original.roll};
+        return this.yaw - original.yaw;
     }
 
     public float getX() {

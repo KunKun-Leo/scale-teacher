@@ -47,9 +47,11 @@
 
     <string name="formal_study_success" translatable="true">学习完成，请设置新的学习目标吧</string>
     <string name="formal_study_complete" translatable="true">本轮学习到此结束，下次继续吧</string>
-    <string name="start_correction" translatable="true">现在请调整距离，等待振动提示</string>
+    <string name="start_size_correction" translatable="true">现在请调整距离，等待振动提示</string>
+    <string name="start_angle_correction" translatable="true">现在请调整转向，等待振动提示</string>
     <string name="practice_again" translatable="true">现在再来一次吧！</string>
-    <string name="start_practice" translatable="true">记住这个距离了吗？下面再尝试自己做一次吧！</string>
+    <string name="start_size_practice" translatable="true">记住这个距离了吗？下面再尝试自己做一次吧！</string>
+    <string name="start_angle_practice" translatable="true">记住这个角度了吗？下面再尝试自己做一次吧！</string>
 
     <!--  Common: Finger Gestures  -->
     <string name="gesture_detection_area" translatable="true">手势监测区域，双击并按住即可激活</string>
@@ -58,6 +60,7 @@
     <string name="hold_single_finger" translatable="true">请将手指在原处保持3秒钟</string>
     <string name="wait_second_finger" translatable="true">请放下另一根手指</string>
     <string name="wait_sweep_down" translatable="true">请将手指下拉后停顿</string>
+    <string name="wait_sweep_horizontally" translatable="true">请将手指横拉后停顿</string>
     <string name="holding_two_fingers" translatable="true">请将两指在原处保持3秒钟</string>
 
     <string name="single_finger_activated" translatable="true">接下来，请将手指移动到屏幕上新位置后再保持3秒静止</string>
@@ -65,6 +68,7 @@
     <string name="one_hand_activated" translatable="true">开始测量，请将手机移动到新位置之后保持3秒静止</string>
     <string name="two_hands_activated" translatable="true">接下来，请调整握持手机的手与另一只手的间距，再保持3秒静止</string>
     <string name="body_activated" translatable="true">开始测量，请携带手机走动到新位置之后保持3秒静止</string>
+    <string name="angle_activated" translatable="true">开始测量，请将手机水平置于身前，转动身体朝向后保持3秒静止</string>
 
 
     <!--  Common: Problems  -->

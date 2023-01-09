@@ -110,7 +110,7 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
     }
 
     private void startAngleFormalStudy() {
-        Intent intent = new Intent(this, SizeFormalStudyActivity.class);
+        Intent intent = new Intent(this, AngleFormalStudyActivity.class);
         intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
         intent.putExtra(studyContentTag, StudyContent.STUDY_ANGLE);
         intent.putExtra(studyGoalTag, studyGoal);

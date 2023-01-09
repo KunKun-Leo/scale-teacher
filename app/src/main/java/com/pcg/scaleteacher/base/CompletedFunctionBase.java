@@ -107,14 +107,16 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected static final int steadyDistanceLimit = 5;     //判定手机相对静止的距离要求
     protected static final int steadyTimeLimitA = (int) (3000 / timerInterval);     //时间计数要求A = 5000ms，判定手机不再明显移动的时间要求
     protected static final int steadyTimeLimitB = (int) (5000 / timerInterval);    //时间计数要求B = 5000ms，矫正阶段保持稳定的时间要求
-    //运动跟踪的误差实际上不是一个常数，需要Activity自己实现计算
+    //运动跟踪的距离误差实际上不是一个常数，需要Activity自己实现计算；角度误差是常值
     protected float spatialToleranceA = 5f;
     protected float spatialToleranceB = 15f;
+    public static final float angleToleranceA = 5f;
+    public static final float angleToleranceB = 10f;
 
     public enum ActivationState {
         UNACTIVATED,    //未激活任何功能
         FINGER_ACTIVATING,      //手指在原处一直未发生明显移动，等待一定时间后将激活单指/双指测量
-        MOVE_ACTIVATING,        //手指发生过移动并在新位置停留，等待一定时间后将激活,
+        MOVE_ACTIVATING,        //手指发生过移动并在新位置停留，等待一定时间后将激活
         ACTIVATED       //成功激活了某一测量功能
     }
     protected ActivationState currentActivationState = ActivationState.UNACTIVATED;
@@ -280,6 +282,11 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
                 default:
                     break;
             }
+        }
+        //在学习尺寸时，需要启动运动跟踪功能
+        else if (currentBasicMode == BasicMode.FORMAL_STYLE
+                && currentStudyContent == StudyContent.STUDY_ANGLE) {
+            neededFunction = FunctionType.MOTION_TRACKING;
         }
     }
 

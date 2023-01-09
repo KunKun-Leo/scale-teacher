@@ -30,6 +30,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -41,7 +42,11 @@
             android:exported="false" />
         <activity
             android:name=".main.SizeFormalStudyActivity"
-            android:exported="false"/>
+            android:exported="false" />
+        <activity
+            android:name=".main.AngleFormalStudyActivity"
+            android:exported="false">
+        </activity>
 
         <meta-data
             android:name="com.google.ar.core"
