@@ -1,6 +1,5 @@
 package com.pcg.scaleteacher.main;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
@@ -14,8 +13,6 @@ import android.widget.TextView;
 
 import com.pcg.scaleteacher.R;
 import com.pcg.scaleteacher.base.ConstantBase;
-
-import java.util.zip.Inflater;
 
 public class IntroductionActivity extends ConstantBase {
 
@@ -43,7 +40,7 @@ public class IntroductionActivity extends ConstantBase {
             case BasicMode.FORMAL_STYLE:
                 LinearLayout parentLayout = findViewById(R.id.parent_layout);
                 LayoutInflater inflater = this.getLayoutInflater();
-                LinearLayout switchFooter = (LinearLayout) inflater.inflate(R.layout.formal_stdudy_switch_footer, null);
+                LinearLayout switchFooter = (LinearLayout) inflater.inflate(R.layout.formal_study_switch_footer, null);
                 runOnUiThread(() -> parentLayout.addView(switchFooter, new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, 200)));
                 if (currentStudyContent == StudyContent.STUDY_SIZE) {
                     activeTab = findViewById(R.id.switch_to_size_formal);
@@ -85,17 +82,20 @@ public class IntroductionActivity extends ConstantBase {
         TextView sizeTab = findViewById(R.id.switch_to_size_formal);
         TextView angleTab = findViewById(R.id.switch_to_angle_formal);
         TextView tipContent = findViewById(R.id.tip_content);
+        Intent intent;
         if (currentStudyContent == StudyContent.STUDY_SIZE && viewId == R.id.switch_to_angle_formal) {
-            sizeTab.setTypeface(null, Typeface.NORMAL);
-            angleTab.setTypeface(Typeface.create(angleTab.getTypeface(), Typeface.NORMAL), Typeface.BOLD);
-            tipContent.setText(R.string.angle_formal_tip);
-            currentStudyContent = StudyContent.STUDY_ANGLE;
+            intent = new Intent(this, IntroductionActivity.class);
+            intent.putExtra(basicModeTag, currentBasicMode);
+            intent.putExtra(studyContentTag, StudyContent.STUDY_ANGLE);
+            startActivity(intent);
+            finish();
         }
         else if (currentStudyContent == StudyContent.STUDY_ANGLE && viewId == R.id.switch_to_size_formal) {
-            sizeTab.setTypeface(Typeface.create(sizeTab.getTypeface(), Typeface.NORMAL), Typeface.BOLD);
-            angleTab.setTypeface(null, Typeface.NORMAL);
-            tipContent.setText(R.string.size_formal_tip);
-            currentStudyContent = StudyContent.STUDY_SIZE;
+            intent = new Intent(this, IntroductionActivity.class);
+            intent.putExtra(basicModeTag, currentBasicMode);
+            intent.putExtra(studyContentTag, StudyContent.STUDY_SIZE);
+            startActivity(intent);
+            finish();
         }
     }
 }

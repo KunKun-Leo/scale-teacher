@@ -30,7 +30,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,30 +42,6 @@
         <activity
             android:name=".main.SizeFormalStudyActivity"
             android:exported="false"/>
-        <activity
-            android:name=".main.MeasureOptionActivity"
-            android:exported="false"
-            android:parentActivityName=".main.StartOptionActivity" />
-        <activity
-            android:name=".main.MoveMeasureActivity"
-            android:exported="false" />
-        <activity
-            android:name=".main.TouchMeasureActivity"
-            android:exported="false" />
-        <activity
-            android:name=".main.StudyOptionActivity"
-            android:exported="false"
-            android:parentActivityName=".main.StartOptionActivity" />
-        <activity
-            android:name=".main.AngleStudyActivity"
-            android:exported="false" />
-        <activity
-            android:name=".main.SizeStudyActivity"
-            android:exported="false" />
-        <activity
-            android:name=".main.TestActivity"
-            android:exported="false"
-            android:parentActivityName=".main.StartOptionActivity" />
 
         <meta-data
             android:name="com.google.ar.core"

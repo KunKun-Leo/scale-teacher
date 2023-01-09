@@ -1,15 +1,11 @@
 package com.pcg.scaleteacher.main;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import com.pcg.scaleteacher.R;
 import com.pcg.scaleteacher.base.ConstantBase;
-import com.pcg.scaleteacher.helper.ARCoreCheckHelper;
 
 public class StartOptionActivity extends ConstantBase {
 
@@ -17,7 +13,6 @@ public class StartOptionActivity extends ConstantBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_option);
-        ARCoreCheckHelper.PreCheckARCore(this);
     }
 
     public void chooseStartOption(View view) {

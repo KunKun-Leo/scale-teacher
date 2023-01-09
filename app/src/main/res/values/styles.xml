@@ -49,12 +49,4 @@
         <item name="hintTextColor">@color/light_gray</item>
         <item name="android:textColorHint">@color/light_gray</item>
     </style>
-
-    <!--  ***************新旧代码分割线*****************  -->
-
-    <style name="ConfirmBtn" parent="Theme.AppCompat.Light">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@drawable/button_background_white</item>
-        <item name="android:radius">48dp</item>
-    </style>
 </resources>

@@ -52,7 +52,7 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
         switch (currentStudyContent) {
             case IntroductionActivity.StudyContent.STUDY_SIZE:
                 pageTitle.setText(R.string.input_size);
-                editText.setHint(R.string.input_angle_hint);
+                editText.setHint(R.string.input_size_hint);
 
                 activeTab = findViewById(R.id.switch_to_size_formal);
                 activeTab.setTypeface(Typeface.create(activeTab.getTypeface(), Typeface.NORMAL), Typeface.BOLD);

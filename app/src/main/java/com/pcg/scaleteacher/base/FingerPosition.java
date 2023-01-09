@@ -23,6 +23,7 @@ public class FingerPosition {
         isValid = true;
     }
 
+    //返回厘米距离
     public float calPhysicDistance(FingerPosition other, int dpi) {
         int pixelCount = (int) Math.sqrt( (this.x - other.x) * (this.x - other.x) + (this.y -other.y) * (this.y - other.y) );
         return (float)pixelCount / (float)dpi * 2.54f;

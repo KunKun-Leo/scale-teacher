@@ -9,14 +9,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.pcg.scaleteacher.R;
-import com.pcg.scaleteacher.helper.ARCoreCheckHelper;
-import com.pcg.scaleteacher.helper.CameraPermissionHelper;
 import com.pcg.scaleteacher.helper.ScreenReaderCheckHelper;
 import com.pcg.scaleteacher.slam.GLView;
 
@@ -29,7 +28,6 @@ import cn.easyar.CameraDevice;
 import cn.easyar.Engine;
 import cn.easyar.FunctorOfVoidFromCalibrationDownloadStatusAndOptionalOfString;
 import cn.easyar.ImmediateCallbackScheduler;
-import cn.easyar.InputFrameSource;
 import cn.easyar.MotionTrackerCameraDevice;
 
 /* 该类会试图实现所有的功能，其他具体Activity继承该类时会删减功能 */
@@ -53,8 +51,9 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     public static class FunctionType {
         public static final int UNKNOWN = 0;
         public static final int ALL = 1;
-        public static final int MOTION_TRACKING = 2;    //运动跟踪（基于EasyAR）
-        public static final int SINGLE_VISION = 3;      //单目视觉
+        public static final int SCREEN_TOUCHING = 2;    //屏幕手指
+        public static final int MOTION_TRACKING = 3;    //运动跟踪（基于EasyAR）
+        public static final int SINGLE_VISION = 4;      //单目视觉
     }
     protected int neededFunction = FunctionType.UNKNOWN;
 
@@ -70,12 +69,16 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected int fingerCounter = 0;    //手指（不包括无障碍模式下额外使用的手指）个数
     protected static final int holdingPositionLimit = 100;   //判定未发生明显移动的距离要求
     protected static final int sweepPositionLimit = 200;    //判定下滑的距离要求
-    protected static final int holdingTimeLimitA = 60;    //时间计数要求A = 60 * timerInterval = 3000ms
-    protected static final int holdingTimeLimitB = 100;    //时间计数要求B = 100 * timerInterval = 5000ms
+    protected static final int holdingTimeLimitA = (int) (3000 / timerInterval);    //时间计数要求A = 3000ms
+    protected static final int holdingTimeLimitB = (int) (5000 / timerInterval);    //时间计数要求B = 5000ms
+    protected static final int holdingTimeLimitC = (int) (3000 / timerInterval);    //时间计数要求C = 3000ms
 
-    //手指测量功能所需要的相关变量
+    //屏幕手指测量功能所需要的相关变量
     protected FingerPosition fingerPosition1;
     protected FingerPosition fingerPosition2;
+    protected int dpi;
+    public static final float fingerToleranceA = 1f;    //不超过此误差，就认为满足要求了）
+    public static final float fingerToleranceB = 2f;    //超过此误差，就认为差得有点多了
 
     //运动跟踪功能需要的相关变量
     protected static String key = "kj+cN5YshCuOShdS83GW7ZDmU61NyOdUPoG0TKINqhyWHawBohC7TO1cowKuS/5e4Ub8LuZI/EC0EaJM+1yiD6QKqhycG7Yns1z1X/tcowe0G6Edsg3tVIwF7QyiEKsCsjerHfVElDP7XLkPpReuAKMN7VSMXKwBuhO6AL4KtkyKUu0eux+7CLgMoh31RJRMoBehCrgJvEz7XKIPtFySQvUToAqiEqod9USUTKQboR2yUIYDthmqOqUfrAW+EKhM+1y8C7kNqkCUEqAbsyyqDbgZoQejF6AA9VLtHbIQvAv5LKoNuAyrB7kZ7UL1DaoApBvhIbUUqg2jKr0PtBWmALBc40ykG6EdslCcG6UYrg2yKr0PtBWmALBc40ykG6EdslCcHrYMvAuEDq4avh+jI7YO7UL1DaoApBvhI7gKpgG5Kr0PtBWmALBc40ykG6EdslCLC7kNqj2nH7sHthKCD6dc40ykG6EdslCML5MqvQ+0FaYAsFySQvUbtx6+DKo6vhOqPaMfoh71RKEbuxLjTL4NgwG0H6NM7RiuAqQbskKsXK0buRqjC54avEztJe0NuBPhHrQZ4R20H6MLoxuuDb8bvUyKUu0YtgymD7kKvEztJe0NuBOiG7kXuxf1I+NMpxKuGrERvQOkXPU19R+hCqURpgr1I+NMuhGrG7sbvEztJe0dshC8C/k3og+wG5scth2kB7kZ7UL1DaoApBvhLbsRugqFG6wBsBCmGr4RoUz7XLwLuQ2qQIUbrAGlGqYAsFzjTKQboR2yUIAMvRusGoMMrg28F6EJ9VLtHbIQvAv5LbocsR+sC4MMrg28F6EJ9VLtHbIQvAv5Lb8PpQ2qPacfuwe2EoIPp1zjTKQboR2yUIIBoxegAIMMrg28F6EJ9VLtHbIQvAv5OqoApBucHrYKpg+7M64e9VLtHbIQvAv5PY4qgwyuDbwXoQn1I+NMsga/B6Ubmwe6G5wathO/TO0QugK7Uu0HpDKgDbYS7VSxH6MdsgPjFfUcugCzEqonsw3tVIxc7TP7XLkPpReuAKMN7VSMXKwBuhO6AL4KtkyKUu0eux+7CLgMoh31RJRMvhG8TIpS7QO4GroCsg3tVIxcvAu5DapAnhOuCbIqvQ+0FaYAsFzjTKQboR2yUIwCuAurPLIdoAm5F7sHuBDtQvUNqgCkG+E8sh2gHLMXoQn1Uu0dshC8C/kxrQSyHbs6pR+sBb4QqEz7XLwLuQ2qQIQLvQi2Hao6pR+sBb4QqEz7XLwLuQ2qQIQOrhykG5wetgqmD7szrh71Uu0dshC8C/kzoBq+EaE6pR+sBb4QqEz7XLwLuQ2qQJMboR2yLb8PoxeuApofv0z7XLwLuQ2qQJQ/izqlH6wFvhCoTIpS7QuvDqYcsiqmA7Ituw+6Du1UuQujAvtcph2bEawPu1z1CLYSvAuqI7J45/UTMdos/ZxNl3SuEOyeYqcSjv71OCIrnzGsxIQRrrKNVsa2fx0EyMyqOV+wKtQxUsBCyvS/THZr42L1rTi63KT7aw/ZIP/PjyxMtimvdW+4Z7F2CWbLLh934iQyEGn98kbZ5Z8vZTHuMYGALezVAyfE2qbY6N9uv0dAQGQpYtnSDW1dfeOP2yQu3j3Y6nSF1Wm1IiT+kDWDGNoQTwjC+ciQZjQzuDMHpscMbsjPjoqKfsp12+mDLEkAuihzeCYr4ltW4afef1J7+Bnx+mR+qoZGLvgRJvoeCsHrl8bkDUfU5DRhZasr/ageJUATkjkm3V9xjrj2HPEYLfvXfs9u";
@@ -84,6 +87,9 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
 
     protected SpatialPose spatialPose1;
     protected SpatialPose spatialPose2;
+    //运动跟踪的误差实际上不是一个常数，需要Activity自己实现计算
+    protected float spatialToleranceA = 5f;
+    protected float spatialToleranceB = 15f;
 
     public enum ActivationState {
         UNACTIVATED,    //未激活任何功能
@@ -101,6 +107,8 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         identifyFunctionType();    //识别需要相应的功能模块
         initTimer();        //启动伪定时器
         initFingerDetection();      //初始化手势检测相关的变量
+        initScreenTouching();       //按需启动屏幕触摸测距功能
+        //initMotionTracking();     由于涉及获取界面元素，运动跟踪功能必须由具体Activity设置好布局之后再启动
         hasScreenReader = ScreenReaderCheckHelper.check(this);
     }
 
@@ -209,6 +217,11 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         else if (currentBasicMode == BasicMode.FORMAL_STYLE
                 && currentStudyContent == StudyContent.STUDY_SIZE) {
             switch (currentMeasureMethod) {
+                //单指和双指需要启动屏幕触摸功能
+                case SizeMeasureMethod.SINGLE_FINGER:
+                case SizeMeasureMethod.TWO_FINGERS:
+                    neededFunction = FunctionType.SCREEN_TOUCHING;
+                    break;
                 //单手测距和躯体移动测距需要启动运动跟踪功能
                 case SizeMeasureMethod.ONE_HAND:
                 case SizeMeasureMethod.BODY:
@@ -261,6 +274,18 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected void endHolding() {
         isHolding = false;
         holdingTime = 0;
+    }
+
+    //启动屏幕触碰功能的函数（由本基类实现即可）
+    protected void initScreenTouching() {
+        if (neededFunction != FunctionType.ALL && neededFunction != FunctionType.SCREEN_TOUCHING)
+            return;
+        fingerPosition1 = new FingerPosition();
+        fingerPosition2 = new FingerPosition();
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        dpi = metrics.densityDpi;
     }
 
 

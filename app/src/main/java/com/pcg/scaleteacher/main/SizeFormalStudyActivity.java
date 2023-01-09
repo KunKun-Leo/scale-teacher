@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.pcg.scaleteacher.R;
 import com.pcg.scaleteacher.base.FingerPosition;
 import com.pcg.scaleteacher.base.FormalStudyBase;
+import com.pcg.scaleteacher.helper.MeasureReportBuilder;
 
 public class SizeFormalStudyActivity extends FormalStudyBase {
 
@@ -114,10 +115,12 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
 
         int index = e.getActionIndex();
         int pointerId = e.getPointerId(index);
+        int pointerIndex = e.findPointerIndex(pointerId);
 
         //如果当前是双指测量模式，且放下的是第二根手指，则开始计数
         if (pointerId == 1 && currentMeasureMethod == SizeMeasureMethod.TWO_FINGERS) {
             startHolding();
+            originalFinger2.update(e.getX(pointerIndex), e.getY(pointerIndex));
             currentActivationState = ActivationState.FINGER_ACTIVATING;
             tts.speak(getString(R.string.holding_two_fingers), TextToSpeech.QUEUE_FLUSH, null, "holdTwoFingers");
         }
@@ -158,10 +161,11 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
                         return false;
                     }
                 }
-                //如果已成功激活了单指测距功能，则每次大幅度移动都会刷新判定基准位置和试图重置时间
+                //如果已成功激活了单指测距功能，则每次大幅度移动都会刷新判定基准位置和重置holdingTime计时
                 if (currentActivationState == ActivationState.ACTIVATED) {
                     if (Math.abs(xDiff1) > holdingPositionLimit || Math.abs(yDiff1) > holdingPositionLimit) {
                         originalFinger1.update(currentFinger1.getX(), currentFinger1.getY());
+                        Log.e("Debug", "abc");
                         startHolding();
                     }
                 }
@@ -180,6 +184,18 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
                         currentActivationState = ActivationState.UNACTIVATED;
                         endHolding();
                         return false;
+                    }
+                }
+                //如果已成功激活了双指测距功能，则每次大幅度移动都会刷新判定基准位置和重置holdingTime计时
+                if (currentActivationState == ActivationState.ACTIVATED) {
+                    if (Math.abs(xDiff1) > holdingPositionLimit || Math.abs(yDiff1) > holdingPositionLimit) {
+                        originalFinger1.update(currentFinger1.getX(), currentFinger1.getY());
+                        startHolding();
+                    }
+                    if (fingerCounter > 1
+                            && (Math.abs(xDiff2) > holdingPositionLimit || Math.abs(yDiff2) > holdingPositionLimit)){
+                        originalFinger2.update(currentFinger2.getX(), currentFinger2.getY());
+                        startHolding();
                     }
                 }
                 break;
@@ -252,6 +268,8 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
             switch (currentMeasureMethod) {
                 case SizeMeasureMethod.SINGLE_FINGER:
                     tts.speak(getString(R.string.single_finger_activated), TextToSpeech.QUEUE_FLUSH, null, "singleFingerActivated");
+                    //单指测量的激活位置，就是两点测距的起始位置
+                    fingerPosition1.update(currentFinger1.getX(), currentFinger1.getY());
                     break;
                 case SizeMeasureMethod.TWO_FINGERS:
                     tts.speak(getString(R.string.two_fingers_activated), TextToSpeech.QUEUE_FLUSH, null, "twoFingersActivated");
@@ -281,14 +299,67 @@ public class SizeFormalStudyActivity extends FormalStudyBase {
             currentActivationState = ActivationState.ACTIVATED;
         }
 
-        //如果当前正在矫正阶段并且已经激活了相关测距功能，则需要实时监测当前做出的长度，以确认是否达标
-        if (currentActivationState == ActivationState.ACTIVATED && currentStudyState == StudyState.CORRECTING) {
-            /************待补充**************/
+
+        if (currentActivationState == ActivationState.ACTIVATED) {
+            //如果当前在初次尝试或反复练习阶段，且测距功能已激活，则需要在保持静止位置判定
+            if (currentStudyState == StudyState.FIRST_TRY || currentStudyState == StudyState.PRACTICING) {
+                if (holdingTime >= holdingTimeLimitC) {
+                    endHolding();
+                    switch (currentMeasureMethod) {
+                        case SizeMeasureMethod.SINGLE_FINGER:
+                            fingerPosition2.update(currentFinger1.getX(), currentFinger1.getY());
+                            tellSizeResult();
+                            break;
+                        case SizeMeasureMethod.TWO_FINGERS:
+                            if (fingerCounter < 2)
+                                break;
+                            fingerPosition1.update(currentFinger1.getX(), currentFinger1.getY());
+                            fingerPosition2.update(currentFinger2.getX(), currentFinger2.getY());
+                            tellSizeResult();
+                            break;
+                    }
+                }
+            }
+            //如果当前正在矫正阶段且测距功能已激活，则需要实时监测当前做出的长度，以确认是否达标
+            if (currentStudyState == StudyState.CORRECTING) {
+                /************待补充**************/
+            }
         }
     }
 
     //播报测量结果
     private void tellSizeResult() {
-
+        switch (currentMeasureMethod) {
+            case SizeMeasureMethod.SINGLE_FINGER:
+            case SizeMeasureMethod.TWO_FINGERS:
+                if (!fingerPosition1.isValid || !fingerPosition2.isValid) {
+                    tts.speak(getString(R.string.unknown_problem), TextToSpeech.QUEUE_FLUSH, null, "unknownProblem");
+                    return;
+                }
+                float fingerDistance = fingerPosition1.calPhysicDistance(fingerPosition2, dpi);
+                tts.speak(MeasureReportBuilder.buildFormalReport(fingerDistance, studyGoal, currentMeasureMethod),
+                        TextToSpeech.QUEUE_FLUSH, null, "result");
+                if (Math.abs(fingerDistance - studyGoal) <= fingerToleranceA) {
+                    tts.speak(getString(R.string.formal_study_success), TextToSpeech.QUEUE_ADD, null, "formalStudySuccess");
+                    Intent intent = new Intent(this, InputStudyContentActivity.class);
+                    intent.putExtra(basicModeTag, BasicMode.FORMAL_STYLE);
+                    intent.putExtra(studyContentTag, currentStudyContent);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+                if (currentStudyState == StudyState.PRACTICING) {
+                    practiceCounter++;
+                    if (practiceCounter >= practiceLimit) {
+                        tts.speak(getString(R.string.formal_study_complete), TextToSpeech.QUEUE_FLUSH, null, "formalStudyComplete");
+                    }
+                }
+                break;
+            case SizeMeasureMethod.ONE_HAND:
+            case SizeMeasureMethod.TWO_HANDS:
+            case SizeMeasureMethod.BODY:
+                /*****************待补充*****************/
+                break;
+        }
     }
 }

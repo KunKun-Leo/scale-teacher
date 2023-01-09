@@ -41,4 +41,20 @@ public class FormalStudyBase extends CompletedFunctionBase {
         }
         studyGoal = intent.getIntExtra(studyGoalTag, defaultGoal);
     }
+
+    @Override
+    protected void initMotionTracking() {
+        super.initMotionTracking();
+
+        spatialToleranceA = getSpatialToleranceA(studyGoal);
+        spatialToleranceB = getSpatialToleranceB(studyGoal);
+    }
+
+    public static float getSpatialToleranceA(int studyGoal) {
+        return studyGoal > 100 ? (float) (studyGoal * 0.05f) : 5f;
+    }
+
+    public static float getSpatialToleranceB(int studyGoal) {
+        return studyGoal > 100 ? (float) (studyGoal * 0.15f) : 15f;
+    }
 }
