@@ -62,19 +62,27 @@ public class IntroductionActivity extends ConstantBase {
         }
     }
 
-    /**********未完成************/
     public void startCurrentMode(View view) {
         Intent intent;
-        Log.e("Debug", String.valueOf(currentBasicMode));
         switch (currentBasicMode) {
             case BasicMode.FORMAL_STYLE:
                 intent = new Intent(this, InputStudyContentActivity.class);
+                intent.putExtra(basicModeTag, currentBasicMode);
                 intent.putExtra(studyContentTag, currentStudyContent);
                 startActivity(intent);
                 break;
             case BasicMode.FREE_STYLE:
+                intent = new Intent(this, FreeStudyActivity.class);
+                intent.putExtra(basicModeTag, currentBasicMode);
+                startActivity(intent);
+                break;
+            case BasicMode.TEST:
+                intent = new Intent(this, TestActivity.class);
+                intent.putExtra(basicModeTag, currentBasicMode);
+                startActivity(intent);
                 break;
         }
+        finish();
     }
 
     public void switchStudyContent(View view) {

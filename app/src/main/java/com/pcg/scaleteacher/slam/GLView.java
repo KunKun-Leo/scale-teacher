@@ -15,7 +15,6 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -37,8 +36,10 @@ public class GLView extends GLSurfaceView
 
     private HelloAR helloAR;
 
-    private float[] translation;    //helloAR传递过来的位移量的值，需要由Activity通过getTranslation()获取
-    private float[] quaternion;     //helloAR传递过来的旋转四元数的值，需要由Activity通过getQuaternion()获取
+    private float[] transform;      //helloAR传递过来的相机相对于世界坐标的变换矩阵原始值（行优先），需要由Activity通过getCameraTransform()获取
+    private float[] translation;    //helloAR传递过来的位移量的值，需要由Activity通过getCameraTranslation()获取
+    //private float[] quaternion = new float[4];     //helloAR传递过来的旋转四元数的值，需要由Activity通过getCameraQuaternion()获取
+    private float[] rotation;     //helloAR传递过来的旋转四元数的值，需要由Activity通过getCameraRotation()获取
 
     public GLView(Context context)
     {
@@ -78,19 +79,30 @@ public class GLView extends GLSurfaceView
 
                 //读取运动跟踪结果
                 translation = helloAR.getTranslation();
-                quaternion = helloAR.getQuaternion();
+                rotation = helloAR.getRotation();
+                transform = helloAR.getTransform();
             }
         });
         this.setZOrderMediaOverlay(true);
 
     }
 
-    public float[] getTranslation() {
+    public float[] getCameraTranslation() {
+        if (translation == null)
+            return new float[] {0f, 0f, 0f};
         return translation;
     }
 
-    public float[] getQuaternion() {
-        return quaternion;
+    public float[] getCameraRotation() {
+        if (rotation == null)
+            return new float[] {0f, 0f, 0f};
+        return rotation;
+    }
+
+    public float[] getCameraTransform() {
+        if (transform == null)
+            return new float[16];
+        return transform;
     }
 
     private Activity getActivity()

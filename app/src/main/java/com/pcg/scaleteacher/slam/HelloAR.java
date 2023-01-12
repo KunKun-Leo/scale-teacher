@@ -39,10 +39,10 @@ public class HelloAR
     private int previousInputFrameIndex = -1;
     private byte[] imageBytes = null;
 
+    private float[] transform = new float[16];      //直接保存从世界坐标系到相机坐标系的变换矩阵值（行优先）
     private float[] translation = new float[3];     //位移偏移量
-    private float[] quaternion = new float[4];      //旋转四元数
-
-    private InputFrame inputFrame;
+    //private float[] quaternion = new float[4];      //旋转四元数（更换计算方法后不需要了）
+    private float[] rotation = new float[3];
 
     public HelloAR()
     {
@@ -255,34 +255,41 @@ public class HelloAR
         return  matrix;
     }
 
-    private void calWorldPose(Matrix44F cameraToWorld) {
+    private void calCameraPose(Matrix44F cameraToWorld) {
         float[] data = cameraToWorld.data;
 
         //计算translation（从米转换为厘米）
-        translation[0] = data[3] * 100;
-        translation[1] = data[7] * 100;
-        translation[2] = data[11] * 100;
+        translation[0] = data[3] * 100;     //sway
+        translation[1] = data[7] * 100;     //heave
+        translation[2] = data[11] * 100;    //surge
 
-        //计算quaternion
-        float rotationTrace = data[0] + data[5] + data[10]; //计算旋转矩阵（左上3×3矩阵）的迹
-        quaternion[3] = (float) (Math.sqrt(rotationTrace + 1) / 2);     // w
-        quaternion[0] = ( data[9] - data[6] ) / (4 * quaternion[3]);     //x
-        quaternion[1] = ( data[1] - data[8] ) / (4 * quaternion[3]);     //y
-        quaternion[2] = ( data[4] - data[1] ) / (4 * quaternion[3]);     //z
+        //计算quaternion（正确性有待验证？）
+//        float rotationTrace = data[0] + data[5] + data[10]; //计算旋转矩阵（左上3×3矩阵）的迹
+//        quaternion[3] = (float) (Math.sqrt(rotationTrace + 1) / 2);     // w
+//        quaternion[0] = ( data[9] - data[6] ) / (4 * quaternion[3]);     //x
+//        quaternion[1] = ( data[1] - data[8] ) / (4 * quaternion[3]);     //y
+//        quaternion[2] = ( data[4] - data[1] ) / (4 * quaternion[3]);     //z
+
+        //计算旋转（为了避免负数角度，统一调整到[0°, 360°)）
+        rotation[0] = (float) Math.toDegrees(Math.atan2(data[9], data[10])) + 180;    //yaw
+        rotation[1] = (float) Math.toDegrees(Math.asin(-data[8]));      //pitch
+        rotation[2] = (float) Math.toDegrees(Math.atan2(data[4], data[0])) + 180;     //roll
+        for (float angle:rotation) {
+            if (angle >= 360)
+                angle = angle - 360;
+        }
     }
 
     public float[] getTranslation() {
         return translation;
     }
 
-    public float[] getQuaternion() {
-        return quaternion;
+    public float[] getRotation() {
+        return rotation;
     }
 
-    private void calRotation() {
-        //假设从世界坐标系到相机坐标系的变换为M4×4，则旋转矩阵就是左上角的3×3子矩阵
-        //假设基于初始状态，状态1的旋转矩阵为R1，状态2的旋转矩阵为R2
-        //那么，从状态1到状态2的旋转矩阵R3应当满足R2=R3R1，即R3=R1的逆R2
+    public float[] getTransform() {
+        return transform;
     }
 
     public void render(int width, int height, int screenRotation)
@@ -299,45 +306,48 @@ public class HelloAR
         if (oframe == null) { return;}
         InputFrame iframe = oframe.inputFrame();
         if (iframe == null) { oframe.dispose(); return; }
+
+
         CameraParameters cameraParameters = iframe.cameraParameters();
         if (cameraParameters == null) { oframe.dispose(); iframe.dispose(); return; }
-        float viewport_aspect_ratio = (float)width / (float)height;
-        Matrix44F imageProjection = cameraParameters.imageProjection(viewport_aspect_ratio, screenRotation, true, false);
-        Image image = iframe.image();
-
-        try {
-            if (iframe.index() != previousInputFrameIndex) {
-                Buffer buffer = image.buffer();
-                try {
-                    if ((imageBytes == null) || (imageBytes.length != buffer.size())) {
-                        imageBytes = new byte[buffer.size()];
-                    }
-                    buffer.copyToByteArray(imageBytes);
-                    bgRenderer.upload(image.format(), image.width(), image.height(), image.pixelWidth(), image.pixelHeight(), ByteBuffer.wrap(imageBytes));
-                } finally {
-                    buffer.dispose();
-                }
-                previousInputFrameIndex = iframe.index();
-            }
-            bgRenderer.render(imageProjection);
-
-            Matrix44F projectionMatrix = cameraParameters.projection(0.01f, 500.f, viewport_aspect_ratio, screenRotation, true, false);
+        //以下被注释掉的代码都是用来绘制glView图像的，由于本应用用不到，就屏蔽掉了
+//        float viewport_aspect_ratio = (float)width / (float)height;
+//        Matrix44F imageProjection = cameraParameters.imageProjection(viewport_aspect_ratio, screenRotation, true, false);
+//        Image image = iframe.image();
+//
+//        try {
+//            if (iframe.index() != previousInputFrameIndex) {
+//                Buffer buffer = image.buffer();
+//                try {
+//                    if ((imageBytes == null) || (imageBytes.length != buffer.size())) {
+//                        imageBytes = new byte[buffer.size()];
+//                    }
+//                    buffer.copyToByteArray(imageBytes);
+//                    bgRenderer.upload(image.format(), image.width(), image.height(), image.pixelWidth(), image.pixelHeight(), ByteBuffer.wrap(imageBytes));
+//                } finally {
+//                    buffer.dispose();
+//                }
+//                previousInputFrameIndex = iframe.index();
+//            }
+//            bgRenderer.render(imageProjection);
+//
+//            Matrix44F projectionMatrix = cameraParameters.projection(0.01f, 500.f, viewport_aspect_ratio, screenRotation, true, false);
             if (iframe.trackingStatus() != MotionTrackingStatus.NotTracking) {
-                Matrix44F transform = iframe.cameraTransform();
-                Matrix44F transformInverse = inverseMatrix(transform);
-                if (boxRenderer != null) {
-                    boxRenderer.render(projectionMatrix, transformInverse, new Vec3F(0.2f, 0.2f, 0.2f));
-                }
-                calWorldPose(transformInverse);
-                //Log.e("Debug", String.valueOf(worldCoordinates[0]) + " " + String.valueOf(worldCoordinates[1]) + " " + String.valueOf(worldCoordinates[2]));
+                Matrix44F transformMatrix = iframe.cameraTransform();
+                transform = transformMatrix.data;
+//                Matrix44F transformInverse = inverseMatrix(transform);        //不要轻易使用此函数！inverseMatrix()会改变transform本来的值，进而使得transform各项与欧拉六自由度的对应关系改变！
+//                if (boxRenderer != null) {
+//                    boxRenderer.render(projectionMatrix, transformInverse, new Vec3F(0.2f, 0.2f, 0.2f));
+//                }
+                calCameraPose(transformMatrix);
             }
-        } finally {
+//        } finally {
             iframe.dispose();
             oframe.dispose();
             if(cameraParameters != null) {
                 cameraParameters.dispose();
             }
-            image.dispose();
-        }
+//            image.dispose();
+//        }
     }
 }

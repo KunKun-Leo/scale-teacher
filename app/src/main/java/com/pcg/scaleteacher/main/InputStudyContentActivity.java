@@ -1,7 +1,5 @@
 package com.pcg.scaleteacher.main;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -27,7 +25,7 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        currentStudyContent = intent.getIntExtra(IntroductionActivity.studyContentTag, IntroductionActivity.StudyContent.STUDY_SIZE);
+        currentStudyContent = intent.getIntExtra(studyContentTag, IntroductionActivity.StudyContent.STUDY_SIZE);
 
         initUI();
         initTextToSpeech();
@@ -122,13 +120,13 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
         Intent intent;
         if (currentStudyContent == IntroductionActivity.StudyContent.STUDY_SIZE && viewId == R.id.switch_to_angle_formal) {
             intent = new Intent(this, InputStudyContentActivity.class);
-            intent.putExtra(IntroductionActivity.studyContentTag, IntroductionActivity.StudyContent.STUDY_ANGLE);
+            intent.putExtra(studyContentTag, IntroductionActivity.StudyContent.STUDY_ANGLE);
             startActivity(intent);
             finish();
         }
         else if (currentStudyContent == IntroductionActivity.StudyContent.STUDY_ANGLE && viewId == R.id.switch_to_size_formal) {
             intent = new Intent(this, InputStudyContentActivity.class);
-            intent.putExtra(IntroductionActivity.studyContentTag, IntroductionActivity.StudyContent.STUDY_SIZE);
+            intent.putExtra(studyContentTag, IntroductionActivity.StudyContent.STUDY_SIZE);
             startActivity(intent);
             finish();
         }

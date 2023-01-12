@@ -7,10 +7,12 @@
     <string name="start_option3" translatable="true">测一测</string>
 
     <!--  IntroductionActivity  -->
-    <string name="size_formal_tip" translatable="true">尺寸正式教学说明</string>
+    <string name="size_formal_tip" translatable="true">
+        尺寸正式教学说明
+    </string>
     <string name="angle_formal_tip" translatable="true">角度正式教学说明</string>
     <string name="free_mode_tip" translatable="true">自由学习说明</string>
-    <string name="test_mode_tip" translatable="true">自由学习说明</string>
+    <string name="test_mode_tip" translatable="true">测一测说明</string>
 
     <string name="continue_button" translatable="true">继续</string>
 
@@ -50,18 +52,41 @@
     <string name="start_size_correction" translatable="true">现在请调整距离，等待振动提示</string>
     <string name="start_angle_correction" translatable="true">现在请调整转向，等待振动提示</string>
     <string name="practice_again" translatable="true">现在再来一次吧！</string>
-    <string name="start_size_practice" translatable="true">记住这个距离了吗？下面再尝试自己做一次吧！</string>
-    <string name="start_angle_practice" translatable="true">记住这个角度了吗？下面再尝试自己做一次吧！</string>
+    <string name="start_size_practice" translatable="true">记住这个距离了吗？下面再自己做几次巩固吧！</string>
+    <string name="start_angle_practice" translatable="true">记住这个角度了吗？下面再自己做几次巩固吧！</string>
+
+
+    <!--  FreeStudyActivity  -->
+    <string name="last_measure" translatable="true">上次测量结果</string>
+    <string name="start_repeating" translatable="true">接下来，让我们再做一次，等待手机振动提示！</string>
+    <string name="start_size_repeating_again" translatable="true">对这个尺寸是不是印象更深了？让我们再做一次吧！</string>
+    <string name="start_angle_repeating_again" translatable="true">对这个角度是不是印象更深了？让我们再做一次吧！</string>
+    <string name="repeating_finished" translatable="true">接下来，让我们继续探索其他尺寸或角度吧~</string>
+
+    <!--  TestActivity  -->
+    <string name="test_goal" translatable="true">正在测验</string>
+    <string name="test_passed" translatable="true">测验达标，马上开始下一测验！</string>
+    <string name="test_need_another_try" translatable="true">让我们再试一次吧！</string>
+    <string name="test_failed" translatable="true">你好像没有掌握好，马上为你转入正式教学模块，好好学习一下吧！</string>
+
 
     <!--  Common: Finger Gestures  -->
-    <string name="gesture_detection_area" translatable="true">手势监测区域，双击并按住即可激活</string>
-    <string name="gesture_detection_ready" translatable="true">手势监测已就绪，请按住当前手指，使用其他手指操作</string>
+    <string name="gesture_detection_area" translatable="true">手指监测区域，双击并按住即可激活</string>
+    <string name="gesture_detection_ready" translatable="true">手指监测已就绪</string>
+    <string name="gesture_detection_finish" translatable="true">手指监测已关闭</string>
+    <string name="put_finger_to_activate" translatable="true">请按住当前手指，使用其他手指操作</string>
+    <string name="hold_to_activate">请按住当前手指5秒钟以激活测量功能</string>
+    <string name="parallel_phone_and_ground" translatable="true">测量角度时还需要您将手机屏幕向上，水平置于身前</string>
 
-    <string name="hold_single_finger" translatable="true">请将手指在原处保持3秒钟</string>
-    <string name="wait_second_finger" translatable="true">请放下另一根手指</string>
+    <string name="hold_current_finger" translatable="true">请将手指在原处保持3秒钟</string>
+    <string name="wait_another_finger" translatable="true">请放下另一根手指</string>
     <string name="wait_sweep_down" translatable="true">请将手指下拉后停顿</string>
     <string name="wait_sweep_horizontally" translatable="true">请将手指横拉后停顿</string>
     <string name="holding_two_fingers" translatable="true">请将两指在原处保持3秒钟</string>
+
+    <string name="single_finger_confirmed" translatable="true">单指测距开启。</string>
+    <string name="two_fingers_confirmed" translatable="true">两指测距开启。</string>
+    <string name="mixed_confirmed" translatable="true">单手、双手、躯体测距或角度测量开启。</string>
 
     <string name="single_finger_activated" translatable="true">接下来，请将手指移动到屏幕上新位置后再保持3秒静止</string>
     <string name="two_fingers_activated" translatable="true">接下来，请在屏幕上调整两指间距，再保持3秒静止</string>
@@ -77,5 +102,6 @@
     <string name="activation_canceled" translatable="true">已取消</string>
     <string name="unknown_problem" translatable="true">测量失败，请重试</string>
     <string name="vibrator_problem" translatable="true">手机振动功能似乎不可用</string>
+    <string name="tracking_error" translatable="true">手机监测似乎出了一点问题，请重试</string>
 
 </resources>

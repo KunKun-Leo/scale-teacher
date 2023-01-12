@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.AngleFormalStudyActivity"
+    tools:context=".main.TestActivity"
     android:keepScreenOn="true">
 
     <FrameLayout
@@ -36,10 +36,10 @@
                 android:textColor="@color/white"
                 android:textSize="36sp"
                 android:textStyle="bold"
-                android:text="@string/study_goal" />
+                android:text="@string/test_goal" />
 
             <TextView
-                android:id="@+id/study_goal_value"
+                android:id="@+id/test_goal_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -78,36 +78,6 @@
                 android:text="@string/unknown_value" />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/yaw"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="36sp"
-                android:text="xxx" />
-            <TextView
-                android:id="@+id/pitch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="36sp"
-                android:text="xxx" />
-            <TextView
-                android:id="@+id/roll"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="36sp"
-                android:text="xxx" />
-        </LinearLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

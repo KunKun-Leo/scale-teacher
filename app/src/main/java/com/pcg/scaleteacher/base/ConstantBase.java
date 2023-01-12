@@ -22,11 +22,16 @@ public class ConstantBase extends AppCompatActivity {
     //（长度）测量方式分类
     public static final String sizeMeasureMethodTag = "SCALE TEACHER SIZE MEASURE METHOD";
     public static class SizeMeasureMethod {
-        public static final int SINGLE_FINGER = 0;
-        public static final int TWO_FINGERS = 1;
-        public static final int ONE_HAND = 2;
-        public static final int TWO_HANDS = 3;
-        public static final int BODY = 4;
+        public static final int UNKNOWN = 0;
+        public static final int SINGLE_FINGER = 1;
+        public static final int TWO_FINGERS = 2;
+        public static final int ONE_HAND = 3;
+        public static final int TWO_HANDS = 4;
+        public static final int BODY = 5;
+        public static final int MIXED = 6;      //可能是ONE_HAND、 TWO_HANDS、 BODY、 ANGLE中的任何一种
+    }
+    public static class AngleMeasureMethod {
+        public static final int ANGLE = 7;      //角度其实只有一种测量方法，这里只是为了与SizeMeasureMethod并列，便于使用
     }
 
     //学习目标（仅限正式教学模式）

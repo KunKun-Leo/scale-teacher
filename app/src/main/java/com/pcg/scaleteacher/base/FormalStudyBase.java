@@ -13,18 +13,15 @@ public class FormalStudyBase extends CompletedFunctionBase {
     protected int studyGoal;
 
     //所处的学习环节
-    protected enum StudyState {
+    protected enum FormalStudyState {
         FIRST_TRY,      //初次尝试阶段
         CORRECTING,     //对初次尝试的纠正阶段
         CORRECTED,      //已经纠正完成，但还没有开始练习的中间阶段
         PRACTICING      //反复练习阶段
     }
-    protected StudyState currentStudyState = StudyState.FIRST_TRY;
-    protected int practiceCounter = 0;      //练习阶段重复次数
-    protected static final int practiceLimit = 5;   //练习阶段重复上限
-
-    //测量是否已经激活
-    protected boolean isMeasureActivated = false;
+    protected FormalStudyState currentStudyState = FormalStudyState.FIRST_TRY;
+    protected int practiceSuccessCounter = 0;      //练习阶段成功册数
+    protected static final int practiceSuccessLimit = 5;   //练习阶段成功上限
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

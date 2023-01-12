@@ -45,8 +45,13 @@
             android:exported="false" />
         <activity
             android:name=".main.AngleFormalStudyActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
+        <activity
+            android:name=".main.TestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".main.FreeStudyActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.ar.core"

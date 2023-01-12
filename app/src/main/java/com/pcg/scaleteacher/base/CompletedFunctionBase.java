@@ -14,7 +14,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.pcg.scaleteacher.R;
@@ -67,6 +66,9 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected boolean hasScreenReader;      //指示当前是否开启了读屏（读屏会阻碍触摸时间正常运行，因此需要判断并进行特别处理）
 
     //手势检测所需要的相关变量
+    protected int doubleTappingTime = 0;    //为了保证操作一致性，未开启读屏服务时也要求双击操作，来模拟无障碍模式下的激活控件操作
+    protected boolean isDoubleTapping;      //指示是否开始doubleTappingTime计数
+    protected static final int doubleTappingTimeLimit = (int) (500 / timerInterval);    //当两次点击小于此时间范围时，认为属于双击
     protected FingerPosition currentFinger1;   //第一根手指当前位置
     protected FingerPosition currentFinger2;   //第二根手指当前位置
     protected FingerPosition originalFinger1;   //第一根手指原始位置
@@ -75,11 +77,7 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected boolean isHolding;        //指示是否开始holdingTime计数
     protected boolean finger1Ready;     //第一根手指已在屏幕上
     protected boolean finger2Ready;     //第二根手指已在屏幕上
-    protected int finger1Id;        //手指在触摸事件中的pointerId；当开启了读屏服务时，需要额外有一根手指先用来按住手势监测区域
-    protected int finger2Id;        //
-    //protected int fingerCounter = 0;    //手指（不包括无障碍模式下额外使用的手指）个数
     protected static final int holdingPositionLimit = 100;   //判定未发生明显移动的距离要求
-    protected static final int sweepPositionLimit = 200;    //判定下滑的距离要求
     protected static final int holdingTimeLimitA = (int) (3000 / timerInterval);    //时间计数要求A = 3000ms，启动手指测量的时间要求
     protected static final int holdingTimeLimitB = (int) (5000 / timerInterval);    //时间计数要求B = 5000ms，启动单手/双手/躯体移动测量的时间要求
     protected static final int holdingTimeLimitC = (int) (3000 / timerInterval);    //时间计数要求C = 3000ms，确认当前测距结果的时间要求
@@ -112,12 +110,17 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected float spatialToleranceB = 15f;
     public static final float angleToleranceA = 5f;
     public static final float angleToleranceB = 10f;
+    public static final float rotationDetectionLimit = 15f;     //自由教学模式下，只有超过此限制时，才认为在进行角度测量而非单手/躯体移动测距
 
+
+    //功能判定激活状态
     public enum ActivationState {
         UNACTIVATED,    //未激活任何功能
-        FINGER_ACTIVATING,      //手指在原处一直未发生明显移动，等待一定时间后将激活单指/双指测量
-        MOVE_ACTIVATING,        //手指发生过移动并在新位置停留，等待一定时间后将激活
-        ACTIVATED       //成功激活了某一测量功能
+        WAITING_FINGER1,     //已双击并放下了第0根手指，等待是否还有第1根手指：1）若有，则转入WAITING_THIRD_FINGER；2）若没有，则判定为单手/双手/躯体移动测距或角度测量，更具体的需要由测量结果推测
+        WAITING_FINGER2,       //已放下了两根手指，等待是否还有第2根手指：2）若有，则判定为两指测量；2）若没有，则判定为单指滑动测量
+        FINGER_ACTIVATING,      //手指都已放置完毕，并且在当前位置未发生明显移动，等待一定时间后将激活单指/双指测量
+        ACTIVATED,       //成功激活了某一测量功能，但还没有获得测量结果
+        FINISHED        //单次测量完成
     }
     protected ActivationState currentActivationState = ActivationState.UNACTIVATED;
 
@@ -238,13 +241,13 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
             if (vibrator == null)
                 tts.speak(getString(R.string.vibrator_problem), TextToSpeech.QUEUE_FLUSH, null, "vibratorProblem");
             else
-                vibrator.vibrate(1000);
+                vibrator.vibrate(500);
             vibrationHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     isVibrating = false;
                 }
-            }, 1000);
+            }, 500);
         }
 
     }
@@ -258,8 +261,10 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
 
         //自由教学和测一测模式下需要所有附加功能开启
         if (currentBasicMode == BasicMode.FREE_STYLE
-                || currentBasicMode == BasicMode.TEST)
+                || currentBasicMode == BasicMode.TEST) {
             neededFunction = FunctionType.ALL;
+            currentMeasureMethod = SizeMeasureMethod.UNKNOWN;
+        }
             //正式教学模式下，如果是进行尺寸学习，需要根据尺寸学习方式启动不同的功能
         else if (currentBasicMode == BasicMode.FORMAL_STYLE
                 && currentStudyContent == StudyContent.STUDY_SIZE) {
@@ -307,8 +312,10 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
             holdingTime++;
         if (isSteady)
             steadyTime++;
+        if (!hasScreenReader && isDoubleTapping)
+            doubleTappingTime++;
         if (isRealTimeTracking && glView != null && recentPoses != null) {
-            recentPoses.addPose(new SpatialPose(glView.getTranslation(), glView.getQuaternion()));
+            recentPoses.addPose(new SpatialPose(glView.getCameraTransform()));
         }
     }
 
@@ -320,15 +327,6 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         holdingTime = 0;
         finger1Ready = false;
         finger2Ready = false;
-
-        if (hasScreenReader) {
-            finger1Id = 1;
-            finger2Id = 2;
-        }
-        else {
-            finger1Id = 0;
-            finger2Id = 1;
-        }
     }
 
     //holdingTime开始计数
@@ -341,6 +339,18 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
     protected void endHolding() {
         isHolding = false;
         holdingTime = 0;
+    }
+
+    //doubleTappingTime开始计数
+    protected void startDoubleTapping() {
+        isDoubleTapping = true;
+        doubleTappingTime = 0;
+    }
+
+    //doubleTappingTime结束计数
+    protected void endDoubleTapping() {
+        isDoubleTapping = false;
+        doubleTappingTime = 0;
     }
 
     //启动屏幕触碰功能的函数（由本基类实现即可）
@@ -442,6 +452,11 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
             recentPoses.clear();
     }
 
+    //监测当前手机状态是否是角度测量要求的平行于地面
+    public boolean isPoseForAngle() {
+        //未完成
+        return false;
+    }
 
 
     //以下若干是与运动跟踪功能有关的函数和变量
@@ -485,5 +500,25 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+
+    //启动单目视觉双手测距功能
+    protected void initSingleVision() {
+        //
+        //
+        //待补充
+        //
+        //
+    }
+
+    //获取两手间距离
+    public float getDistanceBetweenHands() {
+        //
+        //
+        //待补充
+        //
+        //
+        return -1f;     //约定如果返回的是任意负数，意味着没有监测到手
     }
 }

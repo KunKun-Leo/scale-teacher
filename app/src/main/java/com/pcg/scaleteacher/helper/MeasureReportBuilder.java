@@ -6,8 +6,8 @@ import com.pcg.scaleteacher.base.FormalStudyBase;
 
 //本类用于生成汇报结果，包括相关的建议话术
 public class MeasureReportBuilder {
-    //尺寸正式学习模式的报告生成
-    public static String buildSizeFormalReport(float result, int goal, int method) {
+    //尺寸测量的报告生成
+    public static String buildSizeReport(float result, int goal, int method) {
         String report = "本次测得";
         float diff = result - goal;
 
@@ -18,14 +18,14 @@ public class MeasureReportBuilder {
             case SizeMeasureMethod.TWO_FINGERS:
                 toleranceA = CompletedFunctionBase.fingerToleranceA;
                 toleranceB = CompletedFunctionBase.fingerToleranceB;
-                report = report + String.format("%.1f", result) + "厘米。";
+                report = report + String.format("%.1f厘米。", result);
                 break;
             case SizeMeasureMethod.ONE_HAND:
             case SizeMeasureMethod.TWO_HANDS:
             case SizeMeasureMethod.BODY:
                 toleranceA = FormalStudyBase.getSpatialToleranceA(goal);
                 toleranceB = FormalStudyBase.getSpatialToleranceB(goal);
-                report = report + (int) result + "厘米。";
+                report = report + String.format("%.0f厘米。", result);
                 break;
             default:
                 return "";
@@ -44,10 +44,11 @@ public class MeasureReportBuilder {
         return report;
     }
 
-    public static String buildAngleFormalReport(int result, int goal) {
+    //角度测量的报告生成
+    public static String buildAngleReport(float result, int goal) {
         String report = "本次测得";
         float diff = result - goal;
-
+        report = report + String.format("%.0f度。", diff);
         if (Math.abs(diff) <= CompletedFunctionBase.angleToleranceA)
             report = report + "误差很小，你完成得很棒！";
         else if (Math.abs(diff) <= CompletedFunctionBase.angleToleranceB) {
