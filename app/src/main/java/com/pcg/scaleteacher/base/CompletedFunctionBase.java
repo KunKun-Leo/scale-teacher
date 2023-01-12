@@ -227,6 +227,11 @@ public class CompletedFunctionBase extends ConstantBase implements TextToSpeech.
         tts = new TextToSpeech(this, this);
         tts.setPitch(1.0f);
         tts.setSpeechRate(1f);
+
+        //由于华为手机的TTS语速太慢了，需要单独适配
+        String manufacturer = Build.MANUFACTURER;
+        if (manufacturer.equalsIgnoreCase("huawei") || manufacturer.equalsIgnoreCase("honor"))
+            tts.setSpeechRate(1.5f);
     }
 
     private void initVibrator() {

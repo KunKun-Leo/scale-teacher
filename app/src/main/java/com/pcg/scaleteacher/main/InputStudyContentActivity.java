@@ -2,6 +2,7 @@ package com.pcg.scaleteacher.main;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -149,6 +150,12 @@ public class InputStudyContentActivity extends ConstantBase implements TextToSpe
         tts = new TextToSpeech(this, this);
         tts.setPitch(1.0f);
         tts.setSpeechRate(1f);
+
+        //由于华为手机的TTS语速太慢了，需要单独适配
+        String manufacturer = Build.MANUFACTURER;
+        if (manufacturer.equalsIgnoreCase("huawei") || manufacturer.equalsIgnoreCase("honor"))
+            tts.setSpeechRate(1.5f);
+
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {}
